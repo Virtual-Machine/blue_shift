@@ -155,31 +155,27 @@ class Canvas {
 		this.clearClickLayer()
 	}
 
+	drawPath(layer, x, y, width, height, color){
+		this[layer].beginPath()
+		this[layer].rect(x + this.deltaWX, y + this.deltaWY, width, height)
+		this[layer].lineWidth = 1
+		this[layer].strokeStyle = color
+		this[layer].stroke()
+	}
+
 	drawRect(layer, x, y, width, height){
 		switch(layer){
 		case 'background':
-			this.backgroundLayer.beginPath()
-			this.backgroundLayer.rect(x + this.deltaWX, y + this.deltaWY, width, height)
-			this.backgroundLayer.lineWidth = 1
-			this.backgroundLayer.strokeStyle = "#004400"
-			this.backgroundLayer.stroke()
+			this.drawPath('backgroundLayer', x, y, width, height, "#004400")
 			break
 		case 'item':
-			this.itemLayer.beginPath()
-			this.itemLayer.rect(x + this.deltaWX, y + this.deltaWY, width, height)
-			this.itemLayer.lineWidth = 1
-			this.itemLayer.strokeStyle = "#443300"
-			this.itemLayer.stroke()
+			this.drawPath('itemLayer', x, y, width, height, "#443300")
 			this.clickLayer.beginPath()
 			this.clickLayer.rect(x + this.deltaWX, y + this.deltaWY, width, height)
 			this.clickLayer.addHitRegion({id:'item'})
 			break
 		case 'character':
-			this.characterLayer.beginPath()
-			this.characterLayer.rect(x + this.deltaWX, y + this.deltaWY, width, height)
-			this.characterLayer.lineWidth = 1
-			this.characterLayer.strokeStyle = "#440000"
-			this.characterLayer.stroke()
+			this.drawPath('characterLayer', x, y, width, height, "#440000")
 			this.clickLayer.beginPath()
 			this.clickLayer.rect(x + this.deltaWX, y + this.deltaWY, width, height)
 			this.clickLayer.addHitRegion({id:'character'})
