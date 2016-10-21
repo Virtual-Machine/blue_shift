@@ -11,6 +11,7 @@ import (
 
 type Configuration struct {
     Mode    string
+    Port	string
 }
 
 func main() {
@@ -18,18 +19,18 @@ func main() {
 	
 	file, _ := os.Open("settings.json")
 	decoder := json.NewDecoder(file)
-	configuration := Configuration{}
-	err := decoder.Decode(&configuration)
+	conf := Configuration{}
+	err := decoder.Decode(&conf)
 	if err != nil {
 	  log.Fatal("Error:", err)
 	}
 
-	hub := socket.NewHub(configuration.Mode)
+	hub := socket.NewHub(conf.Mode)
 	go hub.Run()
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		socket.ServeWs(hub, w, r)
 	})
 
 	http.Handle("/", http.FileServer(http.Dir("./client/")))
-    log.Fatal(http.ListenAndServe(":8090", nil))
+    log.Fatal(http.ListenAndServe(conf.Port, nil))
 }
