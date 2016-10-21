@@ -1,4 +1,4 @@
-conn = new WebSocket("ws://localhost:8090/ws")
+conn = new WebSocket("ws://192.168.5.10:8090/ws")
 
 conn.onopen = function (evt) {
     console.log("Opening connection")

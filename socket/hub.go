@@ -39,14 +39,14 @@ func (h *Hub) Run() {
 
 func (h *Hub) connect(client *Client){
 	if h.mode == "Debug" {
-		log.Println("Connecting socket")
+		log.Println("Connecting socket @", client.conn.RemoteAddr())
 	}
 	h.clients[client] = true
 }
 
 func (h *Hub) disconnect(client *Client){
 	if h.mode == "Debug" {
-		log.Println("Disconnecting socket")
+		log.Println("Disconnecting socket @", client.conn.RemoteAddr())
 	}
 	if _, ok := h.clients[client]; ok {
 		delete(h.clients, client)
@@ -70,6 +70,9 @@ func (h *Hub) sendBroadcast(message []byte){
 	for client := range h.clients {
 		select {
 		case client.send <- message:
+			if h.mode == "Debug" {
+				log.Println(client.conn.RemoteAddr(), "received: ", message)
+			}
 		default:
 			if h.mode == "Debug" {
 				log.Println("Default Condition -- No message into client.send -- see line 54 hub.go")
