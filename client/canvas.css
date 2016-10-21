@@ -1,0 +1,40 @@
+html, body {
+	background-color: #111;
+	padding: 0;
+	height: 100%;
+	margin: 0;
+}
+
+#CanvasHolder {
+	width: 1260px;
+	height: 675px;
+	background-color: black;
+	position: absolute;
+	z-index: 1;
+	left: 0; top: 0; right: 0; bottom: 0;
+	margin: auto;	
+}
+
+#BackgroundLayer {
+	position: absolute;
+	top: 0; left: 0;
+	z-index: 10;
+}
+
+#ItemLayer {
+	position: absolute;
+	top: 0; left: 0;
+	z-index: 20;
+}
+
+#CharacterLayer {
+	position: absolute;
+	top: 0; left: 0;
+	z-index: 30;
+}
+
+#ClickLayer {
+	position: absolute;
+	top: 0; left: 0;
+	z-index: 40;
+}
