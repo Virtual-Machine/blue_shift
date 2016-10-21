@@ -58,6 +58,7 @@ func (h *Hub) intakeRequest(request []byte){
 	if h.mode == "Debug" {
 		log.Println("Got request: " + string(request))
 	}
+	// TODO process intake request properly
 	if string(request) == "BROADCAST" {
 		h.sendBroadcast(request)
 	}
@@ -71,7 +72,7 @@ func (h *Hub) sendBroadcast(message []byte){
 		select {
 		case client.send <- message:
 			if h.mode == "Debug" {
-				log.Println(client.conn.RemoteAddr(), "received: ", message)
+				log.Println(client.conn.RemoteAddr(), "received: ", string(message))
 			}
 		default:
 			if h.mode == "Debug" {
