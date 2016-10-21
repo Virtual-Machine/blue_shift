@@ -59,9 +59,12 @@ class Canvas {
 		this.scale = scale
 		this.grid = new Grid(this.backgroundWidth, this.backgroundHeight, this.scale)
 
-		injectStylesheet()
-
-		let layers = injectCanvas(this.width, this.height)
+		let layers = {
+			layer1: document.getElementById('BackgroundLayer'),
+			layer2: document.getElementById('ItemLayer'),
+			layer3: document.getElementById('CharacterLayer'),
+			layer4: document.getElementById('ClickLayer')
+		}
 
 		layers.layer4.addEventListener('mousedown', function(e){
 			if(e.region){
@@ -221,53 +224,6 @@ class Canvas {
 			let yPixels = this.grid.cells[i].getYPixels(this.scale)
 			this.drawRect('background', xPixels, yPixels, this.scale, this.scale)
 		}
-	}
-}
-
-function injectStylesheet() {
-	let style = document.createElement('link')
-	style.setAttribute("rel", "stylesheet")
-	style.setAttribute('href', "canvas.css")
-	document.head.appendChild(style)
-}
-
-function injectCanvas(width, height){
-	let holder = document.createElement('div')
-	let layer1 = document.createElement('canvas')
-	let layer2 = document.createElement('canvas')
-	let layer3 = document.createElement('canvas')
-	let layer4 = document.createElement('canvas')
-
-	holder.id = "CanvasHolder"
-
-	layer1.id = "BackgroundLayer"
-	layer1.width = width
-	layer1.height = height
-
-	layer2.id = "ItemLayer"
-	layer2.width = width
-	layer2.height = height
-
-	layer3.id = "CharacterLayer"
-	layer3.width = width
-	layer3.height = height
-
-	layer4.id = "ClickLayer"
-	layer4.width = width
-	layer4.height = height
-
-	holder.appendChild(layer1)
-	holder.appendChild(layer2)
-	holder.appendChild(layer3)
-	holder.appendChild(layer4)
-
-	document.body.insertBefore(holder, document.body.firstChild)
-
-	return {
-		layer1: layer1,
-		layer2: layer2,
-		layer3: layer3,
-		layer4: layer4
 	}
 }
 
