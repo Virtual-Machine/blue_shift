@@ -163,6 +163,12 @@ class Canvas {
 		this[layer].stroke()
 	}
 
+	addHitPath(type, x, y, width, height){
+		this.clickLayer.beginPath()
+		this.clickLayer.rect(x + this.deltaWX, y + this.deltaWY, width, height)
+		this.clickLayer.addHitRegion({id:type})
+	}
+
 	drawRect(layer, x, y, width, height){
 		switch(layer){
 		case 'background':
@@ -170,15 +176,11 @@ class Canvas {
 			break
 		case 'item':
 			this.drawPath('itemLayer', x, y, width, height, "#443300")
-			this.clickLayer.beginPath()
-			this.clickLayer.rect(x + this.deltaWX, y + this.deltaWY, width, height)
-			this.clickLayer.addHitRegion({id:'item'})
+			this.addHitPath('item', x, y, width, height)
 			break
 		case 'character':
 			this.drawPath('characterLayer', x, y, width, height, "#440000")
-			this.clickLayer.beginPath()
-			this.clickLayer.rect(x + this.deltaWX, y + this.deltaWY, width, height)
-			this.clickLayer.addHitRegion({id:'character'})
+			this.addHitPath('character', x, y, width, height)
 			break
 		}
 	}
