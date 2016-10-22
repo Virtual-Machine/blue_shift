@@ -4,8 +4,8 @@ import "log"
 
 type Hub struct {
 	clients map[*Client]bool
-	broadcast chan []byte
-	request chan []byte
+	broadcast chan *Packet
+	request chan *Packet
 	register chan *Client
 	unregister chan *Client
 	mode string
@@ -13,8 +13,8 @@ type Hub struct {
 
 func NewHub(modeStr string) *Hub {
 	return &Hub{
-		broadcast:  make(chan []byte),
-		request:  	make(chan []byte),
+		broadcast:  make(chan *Packet),
+		request:  	make(chan *Packet),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		clients:    make(map[*Client]bool),
@@ -54,25 +54,25 @@ func (h *Hub) disconnect(client *Client){
 	}
 }
 
-func (h *Hub) intakeRequest(request []byte){
+func (h *Hub) intakeRequest(request *Packet){
 	if h.mode == "Debug" {
-		log.Println("Got request: " + string(request))
+		log.Println("Got request: " + request.Data + " From: " + request.Id)
 	}
 	// TODO process intake request properly
-	if string(request) == "BROADCAST" {
+	if request.Data == "BROADCAST" {
 		h.sendBroadcast(request)
 	}
 }
 
-func (h *Hub) sendBroadcast(message []byte){
+func (h *Hub) sendBroadcast(message *Packet){
 	if h.mode == "Debug" {
-		log.Println("Broadcasting: " + string(message))
+		log.Println("Broadcasting: " + message.Data + " From: " + message.Id)
 	}
 	for client := range h.clients {
 		select {
-		case client.send <- message:
+		case client.send <- []byte(message.Data):
 			if h.mode == "Debug" {
-				log.Println(client.conn.RemoteAddr(), "received: ", string(message))
+				log.Println(client.conn.RemoteAddr(), "received: ", message.Data)
 			}
 		default:
 			if h.mode == "Debug" {

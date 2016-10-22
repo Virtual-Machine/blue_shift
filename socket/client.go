@@ -61,8 +61,10 @@ func (c *Client) readPump() {
 			}
 			break
 		}
-		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		c.hub.request <- message
+		var pack Packet
+		pack.Id = c.Tag
+		pack.Data = string(bytes.TrimSpace(bytes.Replace(message, newline, space, -1)))
+		c.hub.request <- &pack
 	}
 }
 
