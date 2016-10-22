@@ -3,18 +3,21 @@ package login
 import (
 	"net/http"
 	"encoding/json"
+	"log"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 type LoginResponse struct {
 	Type 	string
 	Message string
 	Name 	string
-	Password string
 }
 
 type User struct {
     Name      string `json:name`
     Password	string `json:password`
+    Token		string `json:token`
 }
 
 type UserList struct {
@@ -41,17 +44,27 @@ func Api(data UserList, w http.ResponseWriter, r *http.Request){
 			}
 		}
 	}
+	mySigningKey := []byte("AllYourBass")
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+	    "id": u.Name,
+	})
+
+	tokenString, err := token.SignedString(mySigningKey)
+	if err != nil {
+		log.Fatal(err)
+	}
+	u.Token = tokenString
 	sendSuccessResponse(data, w, u)
 }
 
 func sendSuccessResponse(data UserList, w http.ResponseWriter, u User){
 	data.List = append(data.List, u)
-    var res LoginResponse
-    res.Type = "Success"
-    res.Message = "Login successful"
-    res.Name = u.Name
-    res.Password = u.Password
-    json.NewEncoder(w).Encode(res)
+	var res LoginResponse
+	res.Type = "Success"
+	res.Name = u.Name
+	res.Message = u.Token
+	json.NewEncoder(w).Encode(res)
 }
 
 func sendErrorResponse(w http.ResponseWriter){

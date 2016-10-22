@@ -6,8 +6,10 @@ import (
 	"net/http"
 	"time"
 	"strings"
+	"fmt"
 
 	"github.com/gorilla/websocket"
+	"github.com/dgrijalva/jwt-go"
 )
 
 const (
@@ -112,12 +114,26 @@ func (c *Client) writePump() {
 }
 
 func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
+	tokenString := r.URL.Query().Get("id")
+	var idString string
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+	    if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+	        return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+	    }
+	    return []byte("AllYourBass"), nil
+	})
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		idString = claims["id"].(string)
+	} else {
+		log.Println(err)
+	}
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), Tag: r.URL.Query().Get("id")}
+	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), Tag: idString}
 	client.hub.register <- client
 	go client.writePump()
 	client.readPump()

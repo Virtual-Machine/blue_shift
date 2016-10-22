@@ -1,21 +1,18 @@
-function establishSocketConnection(id) {
-	conn = new WebSocket("ws://192.168.5.10:8090/ws?id=" + id)
+function establishSocketConnection(token) {
+	conn = new WebSocket("ws://192.168.5.10:8090/ws?id=" + token)
 
 	conn.onopen = function (evt) {
-	    console.log("Opening connection")
-	    console.log(evt)
+		console.log("Socket connection establshed")
 	}
 	conn.onclose = function (evt) {
-	    console.log("Closing connection")
-	    console.log(evt)
+		console.log("Socket disconnected")
 	}
 	conn.onmessage = function (evt) {
-	    console.log("A message was received")
-	    console.log(evt)
+		var socketPacket = evt.data
+		console.log("Got socket packet data: " + socketPacket)
 	}
 	conn.onerror = function (evt) {
-	    console.log("An error occurred")
-	    console.log(evt)
+	    console.log("Error:", evt)
 	}
 
 	window.sConn = conn
