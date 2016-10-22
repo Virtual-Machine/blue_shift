@@ -1,5 +1,5 @@
-function establishSocketConnection() {
-	conn = new WebSocket("ws://192.168.5.10:8090/ws")
+function establishSocketConnection(id) {
+	conn = new WebSocket("ws://192.168.5.10:8090/ws?id=" + id)
 
 	conn.onopen = function (evt) {
 	    console.log("Opening connection")

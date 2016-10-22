@@ -39,14 +39,14 @@ func (h *Hub) Run() {
 
 func (h *Hub) connect(client *Client){
 	if h.mode == "Debug" {
-		log.Println("Connecting socket @", client.conn.RemoteAddr())
+		log.Println("Connecting socket @", client.conn.RemoteAddr(), client.Tag)
 	}
 	h.clients[client] = true
 }
 
 func (h *Hub) disconnect(client *Client){
 	if h.mode == "Debug" {
-		log.Println("Disconnecting socket @", client.conn.RemoteAddr())
+		log.Println("Disconnecting socket @", client.conn.RemoteAddr(), client.Tag)
 	}
 	if _, ok := h.clients[client]; ok {
 		delete(h.clients, client)

@@ -69,6 +69,7 @@ func main() {
 				}
 			}
 		}
+		data.List = append(data.List, u)
         var res LoginResponse
         res.Type = "Success"
         res.Message = "Login successful"
