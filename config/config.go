@@ -9,6 +9,7 @@ import (
 type Configuration struct {
     Mode    string
     Port	string
+    SigningKey	string
 }
 
 func DecodeConfiguration() Configuration {

@@ -24,7 +24,7 @@ type UserList struct {
 	List []User
 }
 
-func Api(data UserList, w http.ResponseWriter, r *http.Request){
+func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []byte){
 	var u User
 	if r.Body == nil {
 		http.Error(w, "Please send a request body", 400)
@@ -44,7 +44,6 @@ func Api(data UserList, w http.ResponseWriter, r *http.Request){
 			}
 		}
 	}
-	mySigningKey := []byte("AllYourBass")
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 	    "id": u.Name,
@@ -55,11 +54,11 @@ func Api(data UserList, w http.ResponseWriter, r *http.Request){
 		log.Fatal(err)
 	}
 	u.Token = tokenString
-	sendSuccessResponse(data, w, u)
+	data.List = append(data.List, u)
+	sendSuccessResponse(w, u)
 }
 
-func sendSuccessResponse(data UserList, w http.ResponseWriter, u User){
-	data.List = append(data.List, u)
+func sendSuccessResponse(w http.ResponseWriter, u User){
 	var res LoginResponse
 	res.Type = "Success"
 	res.Name = u.Name

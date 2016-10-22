@@ -113,14 +113,14 @@ func (c *Client) writePump() {
 	}
 }
 
-func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
+func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request, api_key []byte) {
 	tokenString := r.URL.Query().Get("id")
 	var idString string
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 	    if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 	        return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 	    }
-	    return []byte("AllYourBass"), nil
+	    return api_key, nil
 	})
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
