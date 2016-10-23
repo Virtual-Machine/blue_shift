@@ -70,7 +70,8 @@ class Canvas {
 			if(e.region){
 				// TODO Client should check if it is the active player
 				let cursorPosition = getMousePos(layers.layer4, e)
-				window.sConn.send(JSON.stringify({type: "click",x: cursorPosition.x, y: cursorPosition.y}))
+				cursorPosition = translatePosition(cursorPosition, this.deltaWX, this.deltaWY)
+				window.sConn.send(JSON.stringify({type: "Click",x: cursorPosition.x, y: cursorPosition.y}))
 			} else {
 				if(!this.dragWindowFlag && !this.dragObjectFlag){
 					this.dragWindowFlag = true
@@ -233,6 +234,17 @@ function getMousePos(canvas, evt) {
 		x: evt.clientX - rect.left,
 		y: evt.clientY - rect.top
 	}
+}
+
+function translatePosition(cursorPosition, deltaWX, deltaWY){
+	cursorPosition.x -= deltaWX
+	cursorPosition.y -= deltaWY
+	cursorPosition.x /= 64
+	cursorPosition.y /= 64
+	cursorPosition.x = Math.floor(cursorPosition.x)
+	cursorPosition.y = Math.floor(cursorPosition.y)
+	console.log(cursorPosition)
+	return cursorPosition
 }
 
 window.canvas = new Canvas(1260, 675, 3840, 2560, 64)
