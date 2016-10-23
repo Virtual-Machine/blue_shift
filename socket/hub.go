@@ -3,6 +3,8 @@ package socket
 import (
 	"log"
 	"encoding/json"
+
+	"../engine"
 )
 
 type Hub struct {
@@ -66,19 +68,18 @@ func (h *Hub) intakeRequest(request *Packet){
 	    log.Println("REQUEST ERROR!!! : ", err)
 	    return
     }
-
-	log.Println(req)
-	// Request now suitable for seding to game engine...
-
-
-	// ... If game engine accepts the move
-
-	// 	h.sendBroadcast( newMapData )
-
-	// ... If game engine rejects the move
-
-	// notify client that their selected move was rejected
-
+    if req.Type == "Click" {
+    	validMove := engine.GameInstance.ProcessClick(request.Id, req.X, req.Y)
+    	if validMove {
+    		// 	h.sendBroadcast( newMapData )
+		} else {
+			// notify client that their selected move was rejected
+		}
+    }
+	if req.Type == "MapData" {
+		mapData := engine.GameInstance.GetData(request.Id, req.Type)
+		log.Println(mapData[0])
+	}
 }
 
 func (h *Hub) sendBroadcast(message *Packet){
