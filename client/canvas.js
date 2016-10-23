@@ -68,7 +68,9 @@ class Canvas {
 
 		layers.layer4.addEventListener('mousedown', function(e){
 			if(e.region){
-				// TODO Handle case where hit region active
+				// TODO Client should check if it is the active player
+				let cursorPosition = getMousePos(layers.layer4, e)
+				window.sConn.send(JSON.stringify({type: "click",x: cursorPosition.x, y: cursorPosition.y}))
 			} else {
 				if(!this.dragWindowFlag && !this.dragObjectFlag){
 					this.dragWindowFlag = true

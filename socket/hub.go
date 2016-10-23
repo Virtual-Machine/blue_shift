@@ -1,6 +1,9 @@
 package socket
 
-import "log"
+import (
+	"log"
+	"encoding/json"
+)
 
 type Hub struct {
 	clients map[*Client]bool
@@ -58,10 +61,24 @@ func (h *Hub) intakeRequest(request *Packet){
 	if h.mode == "Debug" {
 		log.Println("Got request: " + request.Data + " From: " + request.Id)
 	}
-	// TODO process intake request properly
-	if request.Data == "BROADCAST" {
-		h.sendBroadcast(request)
-	}
+	var req Request
+	if err := json.Unmarshal([]byte(request.Data), &req); err != nil {
+	    log.Println("REQUEST ERROR!!! : ", err)
+	    return
+    }
+
+	log.Println(req)
+	// Request now suitable for seding to game engine...
+
+
+	// ... If game engine accepts the move
+
+	// 	h.sendBroadcast( newMapData )
+
+	// ... If game engine rejects the move
+
+	// notify client that their selected move was rejected
+
 }
 
 func (h *Hub) sendBroadcast(message *Packet){

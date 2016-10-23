@@ -66,6 +66,7 @@ func (c *Client) readPump() {
 		var pack Packet
 		pack.Id = c.Tag
 		pack.Data = string(bytes.TrimSpace(bytes.Replace(message, newline, space, -1)))
+		// Client socket is sending a request to the hub
 		c.hub.request <- &pack
 	}
 }
