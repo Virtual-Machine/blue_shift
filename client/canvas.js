@@ -224,6 +224,7 @@ class Canvas {
 			let xPixels = this.grid.cells[i].getXPixels(this.scale)
 			let yPixels = this.grid.cells[i].getYPixels(this.scale)
 			this.drawRect('background', xPixels, yPixels, this.scale, this.scale)
+			this.addHitPath('item', 1, 1, 64, 64)
 		}
 	}
 }
