@@ -71,30 +71,31 @@ func (h *Hub) intakeRequest(request *Packet){
     if req.Type == "Click" {
     	validMove := engine.GameInstance.ProcessClick(request.Id, req.X, req.Y)
     	if validMove {
-    		// 	h.sendBroadcast( newMapData )
+    		request.Data = string(engine.GameInstance.GetData(request.Id, "MapData"))
+    		h.sendBroadcast( request )
 		} else {
 			// notify client that their selected move was rejected
 		}
     }
 	if req.Type == "MapData" {
-		mapData := engine.GameInstance.GetData(request.Id, req.Type)
-		log.Println(mapData[0])
+		request.Data = string(engine.GameInstance.GetData(request.Id, "MapData"))
+		h.sendBroadcast( request )
 	}
 }
 
 func (h *Hub) sendBroadcast(message *Packet){
 	if h.mode == "Debug" {
-		log.Println("Broadcasting: " + message.Data + " From: " + message.Id)
+		log.Println("Broadcasting from: " + message.Id)
 	}
 	for client := range h.clients {
 		select {
 		case client.send <- []byte(message.Data):
 			if h.mode == "Debug" {
-				log.Println(client.conn.RemoteAddr(), "received: ", message.Data)
+				log.Println(client.conn.RemoteAddr(), client.Tag, "received data")
 			}
 		default:
 			if h.mode == "Debug" {
-				log.Println("Default Condition -- No message into client.send -- see line 54 hub.go")
+				log.Println("Default Condition -- No message into client.send")
 			}
 			close(client.send)
 			delete(h.clients, client)

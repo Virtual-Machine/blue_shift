@@ -66,7 +66,10 @@ func (c *Client) readPump() {
 		var pack Packet
 		pack.Id = c.Tag
 		pack.Data = string(bytes.TrimSpace(bytes.Replace(message, newline, space, -1)))
-		// Client socket is sending a request to the hub
+		
+		if c.hub.mode == "Debug" {
+			log.Println("Client socket is sending message to hub:", pack.Id)
+		}
 		c.hub.request <- &pack
 	}
 }
@@ -133,6 +136,9 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request, api_key []byte) {
 	if err != nil {
 		log.Println(err)
 		return
+	}
+	if hub.mode == "Debug" {
+		log.Println("Successful socket connection established for user:", idString)
 	}
 	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), Tag: idString}
 	client.hub.register <- client
