@@ -30,5 +30,8 @@ func main() {
 	})
 
 	http.Handle("/", http.FileServer(http.Dir("./client/")))
+	if conf.Mode == "Debug" {
+		log.Println("Blue Shift   ---Online---    localhost", conf.Port)
+	}
     log.Fatal(http.ListenAndServe(conf.Port, nil))
 }
