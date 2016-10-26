@@ -24,7 +24,7 @@ type UserList struct {
 	List []User
 }
 
-func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []byte){
+func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []byte, mode string){
 	var u User
 	if r.Body == nil {
 		http.Error(w, "Please send a request body", 400)
@@ -39,6 +39,9 @@ func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []
 	for i := range data.List {
 		if data.List[i].Name == u.Name {
 			if data.List[i].Password != u.Password {
+				if mode == "Debug" {
+					log.Println("Invalid submission attempt for account:", data.List[i].Name)
+				}
 				sendErrorResponse(w)
 				return
 			}
@@ -55,6 +58,9 @@ func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []
 	}
 	u.Token = tokenString
 	data.List = append(data.List, u)
+	if mode == "Debug" {
+		log.Println("Successful login via API for account:", u.Name)
+	}
 	sendSuccessResponse(w, u)
 }
 
