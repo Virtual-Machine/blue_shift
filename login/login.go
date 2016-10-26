@@ -15,9 +15,10 @@ type LoginResponse struct {
 }
 
 type User struct {
-    Name      string `json:name`
-    Password	string `json:password`
-    Token		string `json:token`
+    Name      string `json:"name"`
+    Password	string `json:"password"`
+    Token		string `json:"token"`
+    Status 		string `json:"status"`
 }
 
 type UserList struct {

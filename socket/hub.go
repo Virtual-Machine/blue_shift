@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"../engine"
+	"../login"
 )
 
 type Hub struct {
@@ -14,9 +15,11 @@ type Hub struct {
 	register chan *Client
 	unregister chan *Client
 	mode string
+	users *login.UserList
+	count int
 }
 
-func NewHub(modeStr string) *Hub {
+func NewHub(modeStr string, userList *login.UserList) *Hub {
 	return &Hub{
 		broadcast:  make(chan *Packet),
 		request:  	make(chan *Packet),
@@ -24,6 +27,8 @@ func NewHub(modeStr string) *Hub {
 		unregister: make(chan *Client),
 		clients:    make(map[*Client]bool),
 		mode: 		modeStr,
+		users:		userList,
+		count: 		0,
 	}
 }
 
@@ -47,6 +52,13 @@ func (h *Hub) connect(client *Client){
 		log.Println("Connecting socket @", client.conn.RemoteAddr(), client.Tag)
 	}
 	h.clients[client] = true
+	h.count++
+	for i, v := range h.users.List {
+		if v.Name == client.Tag {
+			h.users.List[i].Status = "Online"
+			return
+		}
+	}
 }
 
 func (h *Hub) disconnect(client *Client){
@@ -56,6 +68,13 @@ func (h *Hub) disconnect(client *Client){
 	if _, ok := h.clients[client]; ok {
 		delete(h.clients, client)
 		close(client.send)
+	}
+	h.count--
+	for i, v := range h.users.List {
+		if v.Name == client.Tag {
+			h.users.List[i].Status = "Offline"
+			return
+		}
 	}
 }
 

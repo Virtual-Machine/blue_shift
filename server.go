@@ -18,7 +18,7 @@ func main() {
 
 	api_key := []byte(conf.SigningKey)
 
-	hub := socket.NewHub(conf.Mode)
+	hub := socket.NewHub(conf.Mode, &data)
 	go hub.Run()
 
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
