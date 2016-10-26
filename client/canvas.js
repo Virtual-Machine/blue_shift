@@ -15,6 +15,7 @@ class Canvas {
 		this.buffer = 15
 		this.scale = scale
 		this.grid = new Grid(this.backgroundWidth, this.backgroundHeight, this.scale)
+		this.state = new State()
 
 		this.layers = {
 			layer1: document.getElementById('BackgroundLayer'),
