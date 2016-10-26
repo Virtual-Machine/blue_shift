@@ -8,8 +8,6 @@ function establishSocketConnection(token) {
 		console.log("Socket disconnected")
 	}
 	conn.onmessage = function (evt) {
-		var socketPacket = evt.data
-		console.log("Got socket packet data: ", socketPacket)
 		var parsedPacket = JSON.parse(evt.data)
 		console.log("Got parsed: ", parsedPacket)
 	}
