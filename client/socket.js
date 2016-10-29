@@ -13,6 +13,13 @@ function establishSocketConnection(token) {
 			console.log("Got map data: ", parsedPacket)
 		} else {
 			console.log("Got data packet: ", parsedPacket)
+			if (parsedPacket.count) {
+				var history = document.getElementById('history')
+				var message = document.createElement('div')
+				message.textContent = "There are now " + parsedPacket.count + " active user(s)."
+				history.appendChild(message)
+				history.scrollTop = history.scrollHeight
+			}
 		}
 	}
 	conn.onerror = function (evt) {
