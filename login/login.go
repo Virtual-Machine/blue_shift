@@ -19,6 +19,7 @@ type User struct {
     Password	string `json:"password"`
     Token		string `json:"token"`
     Status 		string `json:"status"`
+    Connections int    `-`
 }
 
 type UserList struct {
@@ -44,6 +45,12 @@ func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []
 					log.Println("Invalid submission attempt for account:", data.List[i].Name)
 				}
 				sendErrorResponse(w)
+				return
+			} else {
+				if mode == "Debug" {
+					log.Println("Successful login via API for account:", u.Name)
+				}
+				sendSuccessResponse(w, data.List[i])
 				return
 			}
 		}

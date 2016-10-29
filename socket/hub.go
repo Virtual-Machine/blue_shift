@@ -17,7 +17,6 @@ type Hub struct {
 	unregister chan *Client
 	mode string
 	users *login.UserList
-	count int
 }
 
 func NewHub(modeStr string, userList *login.UserList) *Hub {
@@ -29,7 +28,6 @@ func NewHub(modeStr string, userList *login.UserList) *Hub {
 		clients:    make(map[*Client]bool),
 		mode: 		modeStr,
 		users:		userList,
-		count: 		0,
 	}
 }
 
@@ -53,13 +51,19 @@ func (h *Hub) connect(client *Client){
 		log.Println("Connecting socket @", client.conn.RemoteAddr(), client.Tag)
 	}
 	h.clients[client] = true
-	h.count++
 	for i, v := range h.users.List {
 		if v.Name == client.Tag {
 			h.users.List[i].Status = "Online"
+			h.users.List[i].Connections++
 			var pack Packet
 			pack.Id = client.Tag
-			pack.Data = "{\"count\":" + strconv.Itoa(h.count) + "}"
+			active := 0
+			for _, v := range h.users.List {
+				if v.Status == "Online" {
+					active++
+				}
+			}
+			pack.Data = "{\"count\":" + strconv.Itoa(active) + "}"
 			h.sendBroadcast(&pack)
 			return
 		}
@@ -74,13 +78,22 @@ func (h *Hub) disconnect(client *Client){
 		delete(h.clients, client)
 		close(client.send)
 	}
-	h.count--
 	for i, v := range h.users.List {
 		if v.Name == client.Tag {
-			h.users.List[i].Status = "Offline"
+			h.users.List[i].Connections--
+			if h.users.List[i].Connections <= 0 {
+				h.users.List[i].Connections = 0
+				h.users.List[i].Status = "Offline"
+			}
 			var pack Packet
 			pack.Id = client.Tag
-			pack.Data = "{\"count\": " + strconv.Itoa(h.count) + "}"
+			active := 0
+			for _, v := range h.users.List {
+				if v.Status == "Online" {
+					active++
+				}
+			}
+			pack.Data = "{\"count\": " + strconv.Itoa(active) + "}"
 			h.sendBroadcast(&pack)
 			return
 		}
