@@ -3,6 +3,7 @@ package socket
 import (
 	"log"
 	"encoding/json"
+	"strconv"
 
 	"../engine"
 	"../login"
@@ -56,6 +57,10 @@ func (h *Hub) connect(client *Client){
 	for i, v := range h.users.List {
 		if v.Name == client.Tag {
 			h.users.List[i].Status = "Online"
+			var pack Packet
+			pack.Id = client.Tag
+			pack.Data = "{\"count\":" + strconv.Itoa(h.count) + "}"
+			h.sendBroadcast(&pack)
 			return
 		}
 	}
@@ -73,6 +78,10 @@ func (h *Hub) disconnect(client *Client){
 	for i, v := range h.users.List {
 		if v.Name == client.Tag {
 			h.users.List[i].Status = "Offline"
+			var pack Packet
+			pack.Id = client.Tag
+			pack.Data = "{\"count\": " + strconv.Itoa(h.count) + "}"
+			h.sendBroadcast(&pack)
 			return
 		}
 	}

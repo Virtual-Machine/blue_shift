@@ -9,7 +9,11 @@ function establishSocketConnection(token) {
 	}
 	conn.onmessage = function (evt) {
 		var parsedPacket = JSON.parse(evt.data)
-		console.log("Got parsed: ", parsedPacket)
+		if (parsedPacket instanceof Array){
+			console.log("Got map data: ", parsedPacket)
+		} else {
+			console.log("Got data packet: ", parsedPacket)
+		}
 	}
 	conn.onerror = function (evt) {
 	    console.log("Error:", evt)
