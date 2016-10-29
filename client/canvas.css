@@ -108,7 +108,7 @@ html, body {
 	left: 1005px;
 	width: 270px;
 	background-color: black;
-	height: 270px;
+	height: 186.667px;
 }
 
 #minimapMap {
@@ -131,9 +131,9 @@ html, body {
 
 #chat {	
 	position: absolute;
-	top: 275px;
+	top: 191.667px;
 	left: 1005px;
-	height: calc(100% - 280px);
+	height: calc(100% - 196.667px);
 	width: 270px;
 	background-color: black;
 }
