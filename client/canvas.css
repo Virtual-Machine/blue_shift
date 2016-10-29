@@ -6,13 +6,11 @@ html, body {
 }
 
 #CanvasHolder {
-	width: 1260px;
-	height: 675px;
+	width: 1000px;
+	height: 535px;
 	background-color: black;
-	position: absolute;
+	position: relative;
 	z-index: 1;
-	left: 0; top: 0; right: 0; bottom: 0;
-	margin: auto;	
 }
 
 #BackgroundLayer {
@@ -102,4 +100,31 @@ html, body {
 	padding-left: 3px;
 	padding-right: 3px;
 	font-size: 12px;
+}
+
+#minimap {
+	position: absolute;
+	top: 0;
+	left: 1005px;
+	width: 270px;
+	background-color: black;
+	height: 270px;
+}
+
+#chat {	
+	position: absolute;
+	top: 275px;
+	left: 1005px;
+	height: calc(100% - 280px);
+	width: 270px;
+	background-color: black;
+}
+
+#history {
+	position: absolute;
+	top: 540px;
+	left: 0;
+	height: calc(100% - 545px);
+	width: 1000px;
+	background-color: black;
 }

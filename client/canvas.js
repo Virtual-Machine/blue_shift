@@ -120,12 +120,12 @@ class Canvas {
 			}
 			if(e.which == 39){
 				self.deltaWX -= 45
-				if (self.deltaWX < -2595){self.deltaWX = -2595}
+				if (self.deltaWX < -2855){self.deltaWX = -2855}
 				self.drawGrid()
 			}
 			if(e.which == 40){
 				self.deltaWY -= 45
-				if (self.deltaWY < -1900){self.deltaWY = -1900}
+				if (self.deltaWY < -2040){self.deltaWY = -2040}
 				self.drawGrid()
 			}
 		})
@@ -147,4 +147,4 @@ class Canvas {
 	}
 }
 
-window.canvas = new Canvas(1260, 675, 3840, 2560, 64)
+window.canvas = new Canvas(1000, 535, 3840, 2560, 64)
