@@ -52,6 +52,7 @@ func (h *Hub) connect(client *Client){
 	h.clients[client] = true
 	for i, v := range h.users.SafeList {
 		if v.Name == client.Tag {
+			// MARKER Server -> Client connected.
 			h.users.SafeList[i].Status = "Online"
 			h.users.SafeList[i].Connections++
 			var pack Packet
@@ -74,6 +75,7 @@ func (h *Hub) disconnect(client *Client){
 	}
 	for i, v := range h.users.SafeList {
 		if v.Name == client.Tag {
+			// MARKER Server -> Client disconnected.
 			h.users.SafeList[i].Connections--
 			if h.users.SafeList[i].Connections <= 0 {
 				h.users.SafeList[i].Connections = 0
@@ -98,13 +100,14 @@ func (h *Hub) intakeRequest(request *Packet){
 	    log.Println("REQUEST ERROR!!! : ", err)
 	    return
     }
+    // MARKER Server -> Socket server received data from client.
     if req.Type == "Click" {
     	validMove := engine.GameInstance.ProcessClick(request.Id, req.X, req.Y)
     	if validMove {
     		request.Data = string(engine.GameInstance.GetData(request.Id, "MapData"))
     		h.sendBroadcast( request )
 		} else {
-			// notify client that their selected move was rejected
+			// TODO Notify client that their selected move was rejected by engine
 		}
     }
 	if req.Type == "MapData" {

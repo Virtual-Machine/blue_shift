@@ -60,7 +60,7 @@ func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []
 			}
 		}
 	}
-
+	// MARKER Server -> A new client is registering with server
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 	    "id": u.Name,
 	})

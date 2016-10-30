@@ -16,9 +16,11 @@ function establishSocketConnection(token) {
 		console.log("Socket disconnected")
 	}
 	conn.onmessage = function (evt) {
+		// MARKER Client -> Client is receiving data from socket hub
 		var parsedPacket = JSON.parse(evt.data)
 		if (parsedPacket instanceof Array){
 			console.log("Got map data: ", parsedPacket)
+			// TODO Process map data
 		} else {
 			console.log("Got data packet: ", parsedPacket)
 			if(parsedPacket.user_list){

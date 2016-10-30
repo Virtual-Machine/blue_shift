@@ -10,6 +10,7 @@ loginButton.addEventListener('click', function(){
 		if (xhr.status === 200) {
 			var serverResponse = JSON.parse(xhr.responseText)
 			if(serverResponse.Type == "Success"){
+				// MARKER Client -> Login successful
 				loginButton.parentNode.style.display = 'none'
 				window.activeClient = submitName
 				window.canvas.setBindings()

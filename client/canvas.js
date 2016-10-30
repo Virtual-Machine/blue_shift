@@ -17,6 +17,7 @@ class Canvas {
 		this.grid = new Grid(this.backgroundWidth, this.backgroundHeight, this.scale)
 		this.state = new State()
 
+		// MARKER Client -> Canvas init
 		this.layers = {
 			layer1: document.getElementById('BackgroundLayer'),
 			layer2: document.getElementById('ItemLayer'),
@@ -97,6 +98,7 @@ class Canvas {
 
 	setBindings(){
 		var self = this
+		// MARKER Client -> Canvas click and keyboard handlers
 		this.layers.layer4.addEventListener('mousedown', function(e){
 			var pos = self.getClickedCell(e)
 			if(window.sConn){
