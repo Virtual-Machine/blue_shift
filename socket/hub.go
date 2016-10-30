@@ -3,7 +3,6 @@ package socket
 import (
 	"log"
 	"encoding/json"
-	"strconv"
 
 	"../engine"
 	"../login"
@@ -51,19 +50,14 @@ func (h *Hub) connect(client *Client){
 		log.Println("Connecting socket @", client.conn.RemoteAddr(), client.Tag)
 	}
 	h.clients[client] = true
-	for i, v := range h.users.List {
+	for i, v := range h.users.SafeList {
 		if v.Name == client.Tag {
-			h.users.List[i].Status = "Online"
-			h.users.List[i].Connections++
+			h.users.SafeList[i].Status = "Online"
+			h.users.SafeList[i].Connections++
 			var pack Packet
 			pack.Id = client.Tag
-			active := 0
-			for _, v := range h.users.List {
-				if v.Status == "Online" {
-					active++
-				}
-			}
-			pack.Data = "{\"count\":" + strconv.Itoa(active) + "}"
+			data, _ := json.Marshal(h.users.SafeList)
+			pack.Data = "{\"user_list\": " + string(data) + "}"
 			h.sendBroadcast(&pack)
 			return
 		}
@@ -78,22 +72,17 @@ func (h *Hub) disconnect(client *Client){
 		delete(h.clients, client)
 		close(client.send)
 	}
-	for i, v := range h.users.List {
+	for i, v := range h.users.SafeList {
 		if v.Name == client.Tag {
-			h.users.List[i].Connections--
-			if h.users.List[i].Connections <= 0 {
-				h.users.List[i].Connections = 0
-				h.users.List[i].Status = "Offline"
+			h.users.SafeList[i].Connections--
+			if h.users.SafeList[i].Connections <= 0 {
+				h.users.SafeList[i].Connections = 0
+				h.users.SafeList[i].Status = "Offline"
 			}
 			var pack Packet
 			pack.Id = client.Tag
-			active := 0
-			for _, v := range h.users.List {
-				if v.Status == "Online" {
-					active++
-				}
-			}
-			pack.Data = "{\"count\": " + strconv.Itoa(active) + "}"
+			data, _ := json.Marshal(h.users.SafeList)
+			pack.Data = "{\"user_list\": " + string(data) + "}"
 			h.sendBroadcast(&pack)
 			return
 		}
@@ -120,6 +109,10 @@ func (h *Hub) intakeRequest(request *Packet){
     }
 	if req.Type == "MapData" {
 		request.Data = string(engine.GameInstance.GetData(request.Id, "MapData"))
+		h.sendBroadcast( request )
+	}
+	if req.Type == "ChatMessage" {
+		request.Data = "{\"message\":\"" + req.Message + "\", \"author\": \"" + request.Id + "\"}"
 		h.sendBroadcast( request )
 	}
 }

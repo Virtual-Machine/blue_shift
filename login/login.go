@@ -14,20 +14,26 @@ type LoginResponse struct {
 	Name 	string
 }
 
+type UserSafe struct {
+	Name      string `json:"name"`
+	Status 		string `json:"status"`
+	Connections int    `json:"connections"`
+}
+
 type User struct {
     Name      string `json:"name"`
     Password	string `json:"password"`
     Token		string `json:"token"`
-    Status 		string `json:"status"`
-    Connections int    `-`
 }
 
 type UserList struct {
 	List []User
+	SafeList []UserSafe
 }
 
 func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []byte, mode string){
 	var u User
+	
 	if r.Body == nil {
 		http.Error(w, "Please send a request body", 400)
 		return
@@ -37,7 +43,6 @@ func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []
 		http.Error(w, err.Error(), 400)
 		return
 	}
-
 	for i := range data.List {
 		if data.List[i].Name == u.Name {
 			if data.List[i].Password != u.Password {
@@ -66,6 +71,11 @@ func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []
 	}
 	u.Token = tokenString
 	data.List = append(data.List, u)
+	var uSafe UserSafe
+	uSafe.Name = u.Name
+	uSafe.Status = "Offline"
+	uSafe.Connections = 0
+	data.SafeList = append(data.SafeList, uSafe)
 	if mode == "Debug" {
 		log.Println("Successful login via API for account:", u.Name)
 	}
