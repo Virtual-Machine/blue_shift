@@ -138,6 +138,76 @@ html, body {
 	background-color: black;
 }
 
+.chat-id {
+	color: #696969;
+	padding-right: 15px;
+}
+
+.chat-message {
+	padding: 15px;
+	border: 1px solid #001211;
+	box-sizing: border-box;
+	margin-bottom: 5px;
+	font-family: monaco;
+}
+
+.chat-user {
+	width: 100%;
+	height: 30px;
+	border: 1px solid #333;
+	box-sizing: border-box;
+	color: #696969;
+	position: relative;
+	line-height: 30px;
+	padding-left: 5px;
+}
+
+.chat-status {
+	position: absolute;
+	right: 5px;
+	color: #a82c51;
+}
+
+.status-online {
+	color: #3e7d85;
+}
+
+.active-user {
+	color: #0c515a;
+}
+
+#users {
+	width: 100%;
+	height: 120px;
+	background-color: black;
+	overflow-y: scroll;
+	padding: 5px;
+	box-sizing: border-box;
+}
+
+#chatDisplay {
+	width: 100%;
+	height: calc(100% - 160px);
+	background-color: #001;
+	overflow-y: scroll;
+	padding: 5px;
+	box-sizing: border-box;
+	color: #424242;
+}
+
+#chatInput {
+	background-color: #111;
+	border: 1px solid #444;
+	color: whitesmoke;
+	font-size: 16px;
+	outline-color: rgba(150, 100, 50, .2);
+	width: 100%;
+	padding: 10px;
+	box-sizing: border-box;
+	position: absolute;
+	bottom: 0;
+}
+
 #history {
 	position: absolute;
 	top: 540px;
