@@ -9,6 +9,7 @@ function establishSocketConnection(token) {
 				document.getElementById('chatInput').value = ""
 				conn.send(JSON.stringify({type: "ChatMessage",message: message}))
 			}
+			event.stopPropagation()
 		})
 	}
 	conn.onclose = function (evt) {

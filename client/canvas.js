@@ -32,8 +32,6 @@ class Canvas {
 		this.turnOffSmoothing()
 
 		this.drawGrid()
-
-		this.setBindings()
 	}
 
 	turnOffSmoothing(){

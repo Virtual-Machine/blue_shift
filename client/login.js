@@ -12,6 +12,7 @@ loginButton.addEventListener('click', function(){
 			if(serverResponse.Type == "Success"){
 				loginButton.parentNode.style.display = 'none'
 				window.activeClient = submitName
+				window.canvas.setBindings()
 				establishSocketConnection(serverResponse.Message)
 			} else {
 				warnText.textContent = serverResponse.Message
