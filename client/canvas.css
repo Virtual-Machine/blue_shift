@@ -200,7 +200,7 @@ html, body {
 	border: 1px solid #444;
 	color: whitesmoke;
 	font-size: 16px;
-	outline-color: rgba(150, 100, 50, .2);
+	outline-color: rgba(0, 100, 50, .2);
 	width: 100%;
 	padding: 10px;
 	box-sizing: border-box;
