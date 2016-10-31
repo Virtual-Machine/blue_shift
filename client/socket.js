@@ -3,10 +3,10 @@ function establishSocketConnection(token) {
 
 	conn.onopen = function (evt) {
 		console.log("Socket connection established")
-		document.getElementById('chatInput').addEventListener('keydown', function(event){
+		$chatInput.addEventListener('keydown', function(event){
 			if (event.which === 13){
-				var message = document.getElementById('chatInput').value
-				document.getElementById('chatInput').value = ""
+				var message = $chatInput.value
+				$chatInput.value = ""
 				conn.send(JSON.stringify({type: "ChatMessage",message: message}))
 			}
 			event.stopPropagation()
@@ -23,15 +23,7 @@ function establishSocketConnection(token) {
 			// TODO Process map data
 		} else {
 			console.log("Got data packet: ", parsedPacket)
-			if(parsedPacket.user_list){
-				updateUserList(parsedPacket.user_list)
-			}
-			if(parsedPacket.author){
-				appendChatMessage(parsedPacket.author, parsedPacket.message)
-			}
-			if(parsedPacket.error){
-				appendMessage(parsedPacket.error)
-			}
+			processPacket(parsedPacket)
 		}
 	}
 	conn.onerror = function (evt) {
@@ -41,8 +33,20 @@ function establishSocketConnection(token) {
 	window.sConn = conn
 }
 
+function processPacket(parsedPacket){
+	if(parsedPacket.user_list){
+		updateUserList(parsedPacket.user_list)
+	}
+	if(parsedPacket.author){
+		appendChatMessage(parsedPacket.author, parsedPacket.message)
+	}
+	if(parsedPacket.error){
+		appendMessage(parsedPacket.error)
+	}
+}
+
 function appendMessage(message){
-	var history = document.getElementById('history')
+	var history = $history
 	var element = document.createElement('div')
 	var textMessage = document.createTextNode(message)
 	element.appendChild(textMessage)
@@ -50,7 +54,7 @@ function appendMessage(message){
 }
 
 function updateUserList(userList){
-	var user_list = document.getElementById('users')
+	var user_list = $userList
 	user_list.innerHTML = ""
 	for(var i in userList){
 		var active = userList[i].name === window.activeClient
@@ -69,7 +73,7 @@ function updateUserList(userList){
 }
 
 function appendChatMessage(author, message){
-	var chatDisplay = document.getElementById('chatDisplay')
+	var chatDisplay = $chatDisplay
 	var element = document.createElement('div')
 	var span = document.createElement('span')
 	element.classList.add('chat-message')

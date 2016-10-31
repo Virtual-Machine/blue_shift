@@ -130,8 +130,8 @@ class Canvas {
 			}
 			var posX = (Math.abs(self.deltaWX - 15) / 2860) * 185
 			var posY = (Math.abs(self.deltaWY - 15) / 2055) * 131.667
-			document.getElementById('minimapCursor').style.left = (posX + "px")
-			document.getElementById('minimapCursor').style.top = (posY + "px")
+			$minimapCursor.style.left = (posX + "px")
+			$minimapCursor.style.top = (posY + "px")
 		})
 	}
 
