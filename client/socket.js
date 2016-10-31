@@ -51,6 +51,7 @@ function appendMessage(message){
 	var textMessage = document.createTextNode(message)
 	element.appendChild(textMessage)
 	history.appendChild(element)
+	history.scrollTop = history.scrollHeight;
 }
 
 function updateUserList(userList){
@@ -84,4 +85,5 @@ function appendChatMessage(author, message){
 	var textMessage = document.createTextNode(message)
 	element.appendChild(textMessage)
 	chatDisplay.appendChild(element)
+	chatDisplay.scrollTop = chatDisplay.scrollHeight;
 }
