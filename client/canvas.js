@@ -15,7 +15,7 @@ class Canvas {
 		this.buffer = 15
 		this.scale = scale
 		this.grid = new Grid(this.backgroundWidth, this.backgroundHeight, this.scale)
-		this.state = new State()
+		this.state = new State("John")
 
 		// MARKER Client -> Canvas init
 		this.layers = {
@@ -100,10 +100,11 @@ class Canvas {
 		var self = this
 		// MARKER Client -> Canvas click and keyboard handlers
 		this.layers.layer4.addEventListener('mousedown', function(e){
-			var pos = self.getClickedCell(e)
-			if(window.sConn){
-				// Check if conn is active conn before doing this!
+			if(self.state.getActive() == window.activeClient){
+				var pos = self.getClickedCell(e)
 				window.sConn.send(JSON.stringify({type: "Click",x: pos.x, y: pos.y}))
+			} else {
+				appendMessage("It is currently " + self.state.getActive() + "'s turn")
 			}
 		})
 

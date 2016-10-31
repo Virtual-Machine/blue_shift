@@ -10,8 +10,8 @@ var $minimapCursor = document.getElementById('minimapCursor')
 
 
 class State {
-	constructor(){
-		this.active = null
+	constructor(firstPlayer){
+		this.active = firstPlayer
 	}
 
 	getActive(){
