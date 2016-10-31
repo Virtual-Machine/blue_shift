@@ -29,6 +29,9 @@ function establishSocketConnection(token) {
 			if(parsedPacket.author){
 				appendChatMessage(parsedPacket.author, parsedPacket.message)
 			}
+			if(parsedPacket.error){
+				appendMessage(parsedPacket.error)
+			}
 		}
 	}
 	conn.onerror = function (evt) {
@@ -36,6 +39,14 @@ function establishSocketConnection(token) {
 	}
 
 	window.sConn = conn
+}
+
+function appendMessage(message){
+	var history = document.getElementById('history')
+	var element = document.createElement('div')
+	var textMessage = document.createTextNode(message)
+	element.appendChild(textMessage)
+	history.appendChild(element)
 }
 
 function updateUserList(userList){

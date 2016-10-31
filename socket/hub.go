@@ -91,42 +91,65 @@ func (h *Hub) disconnect(client *Client){
 	}
 }
 
-func (h *Hub) intakeRequest(request *Packet){
+func (h *Hub) intakeRequest(packet *Packet){
 	if h.mode == "Debug" {
-		log.Println("Got request: " + request.Data + " From: " + request.Id)
+		log.Println("Got packet: " + packet.Data + " From: " + packet.Id)
 	}
 	var req Request
-	if err := json.Unmarshal([]byte(request.Data), &req); err != nil {
+	if err := json.Unmarshal([]byte(packet.Data), &req); err != nil {
 	    log.Println("REQUEST ERROR!!! : ", err)
 	    return
     }
     // MARKER Server -> Socket server received data from client.
     if req.Type == "Click" {
-    	validMove := engine.GameInstance.ProcessClick(request.Id, req.X, req.Y)
+    	validMove := engine.GameInstance.ProcessClick(packet.Id, req.X, req.Y)
     	if validMove {
-    		request.Data = string(engine.GameInstance.GetData(request.Id, "MapData"))
-    		h.sendBroadcast( request )
+    		packet.Data = string(engine.GameInstance.GetData(packet.Id, "MapData"))
+    		h.sendBroadcast( packet )
 		} else {
-			// TODO Notify client that their selected move was rejected by engine
+			packet.Data = "{\"error\":\"Requested move was not accepted by the game engine\"}"
+			h.sendMessage( packet )
 		}
     }
 	if req.Type == "MapData" {
-		request.Data = string(engine.GameInstance.GetData(request.Id, "MapData"))
-		h.sendBroadcast( request )
+		packet.Data = string(engine.GameInstance.GetData(packet.Id, "MapData"))
+		h.sendBroadcast( packet )
 	}
 	if req.Type == "ChatMessage" {
-		request.Data = "{\"message\":\"" + req.Message + "\", \"author\": \"" + request.Id + "\"}"
-		h.sendBroadcast( request )
+		packet.Data = "{\"message\":\"" + req.Message + "\", \"author\": \"" + packet.Id + "\"}"
+		h.sendBroadcast( packet )
 	}
 }
 
-func (h *Hub) sendBroadcast(message *Packet){
+func (h *Hub) sendMessage(packet *Packet){
 	if h.mode == "Debug" {
-		log.Println("Broadcasting from: " + message.Id)
+		log.Println("Sending message to : " + packet.Id)
+	}
+	for client := range h.clients {
+		if client.Tag == packet.Id {
+			select {
+			case client.send <- []byte(packet.Data):
+				if h.mode == "Debug" {
+					log.Println(client.conn.RemoteAddr(), client.Tag, "received data")
+				}
+			default:
+				if h.mode == "Debug" {
+					log.Println("Default Condition -- No message into client.send")
+				}
+				close(client.send)
+				delete(h.clients, client)
+			}
+		}
+	}
+}
+
+func (h *Hub) sendBroadcast(packet *Packet){
+	if h.mode == "Debug" {
+		log.Println("Broadcasting from: " + packet.Id)
 	}
 	for client := range h.clients {
 		select {
-		case client.send <- []byte(message.Data):
+		case client.send <- []byte(packet.Data):
 			if h.mode == "Debug" {
 				log.Println(client.conn.RemoteAddr(), client.Tag, "received data")
 			}
