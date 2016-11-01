@@ -3,6 +3,7 @@ package engine
 import (
 	"encoding/json"
 	"log"
+	"errors"
 )
 
 type MapCell struct {
@@ -28,17 +29,17 @@ func init() {
 	GameInstance.MapData[0][1].Clickable = true
 }
 
-func (g *MockGameEngine) ProcessClick(user string, x int, y int) bool {
+func (g *MockGameEngine) ProcessClick(user string, x int, y int) (bool, error) {
 	if user != g.Active {
-		return false
+		return false, errors.New("User is not active")
 	}
 	if g.MapData[x][y].Blocked {
-		return false
+		return false, errors.New("Cell is blocked")
 	}
 	if g.MapData[x][y].Clickable {
-		return true
+		return true, nil
 	}
-	return false
+	return false, errors.New("Click was either out of bounds or the cell is not clickable")
 }
 
 func (g *MockGameEngine) GetData(user string, request string) []byte {

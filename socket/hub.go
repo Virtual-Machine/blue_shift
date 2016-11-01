@@ -102,12 +102,12 @@ func (h *Hub) intakeRequest(packet *Packet){
     }
     // MARKER Server -> Socket server received data from client.
     if req.Type == "Click" {
-    	validMove := engine.GameInstance.ProcessClick(packet.Id, req.X, req.Y)
+    	validMove, err := engine.GameInstance.ProcessClick(packet.Id, req.X, req.Y)
     	if validMove {
     		packet.Data = string(engine.GameInstance.GetData(packet.Id, "MapData"))
     		h.sendBroadcast( packet )
 		} else {
-			packet.Data = "{\"error\":\"Requested move was not accepted by the game engine\"}"
+			packet.Data = "{\"error\":\"" + err.Error() + "\"}"
 			h.sendMessage( packet )
 		}
     }

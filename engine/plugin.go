@@ -1,7 +1,7 @@
 package engine
 
 type Plugin interface {
-	ProcessClick(user string, x int, y int) bool
+	ProcessClick(user string, x int, y int) (bool, error)
 	GetData(user string, request string) []byte
 }
 
