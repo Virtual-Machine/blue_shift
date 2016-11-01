@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"encoding/json"
 	"log"
+	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -43,13 +44,21 @@ func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []
 		http.Error(w, err.Error(), 400)
 		return
 	}
+	if strings.TrimSpace(u.Name) == "" || strings.TrimSpace(u.Password) == "" {
+		if mode == "Debug" {
+			log.Println("User submitted only whitespace for username and/or password")
+		}
+		sendErrorResponse(w, "Username / Password cannot consist of whitespace characters")
+		return
+	}
+
 	for i := range data.List {
 		if data.List[i].Name == u.Name {
 			if data.List[i].Password != u.Password {
 				if mode == "Debug" {
 					log.Println("Invalid submission attempt for account:", data.List[i].Name)
 				}
-				sendErrorResponse(w)
+				sendErrorResponse(w, "Password is not correct for this user account")
 				return
 			} else {
 				if mode == "Debug" {
@@ -90,9 +99,9 @@ func sendSuccessResponse(w http.ResponseWriter, u User){
 	json.NewEncoder(w).Encode(res)
 }
 
-func sendErrorResponse(w http.ResponseWriter){
+func sendErrorResponse(w http.ResponseWriter, message string){
 	var err LoginResponse
 	err.Type = "Error"
-	err.Message = "Password is not correct for this user account"
+	err.Message = message
 	json.NewEncoder(w).Encode(err)
 }
