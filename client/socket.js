@@ -4,7 +4,7 @@ function establishSocketConnection(token) {
 	conn.onopen = function (evt) {
 		console.log("Socket connection established")
 		$chatInput.addEventListener('keydown', function(event){
-			if (event.which === 13){
+			if (event.which === 13 && $chatInput.value.trim() != ""){
 				var message = $chatInput.value
 				$chatInput.value = ""
 				conn.send(JSON.stringify({type: "ChatMessage",message: message}))
