@@ -102,7 +102,7 @@ func (h *Hub) intakeRequest(packet *Packet){
     }
     // MARKER Server -> Socket server received data from client.
     if req.Type == "Click" {
-		if req.X < 0 || req.Y < 0 || req.X > 60 || req.Y > 40 {
+		if req.X < 0 || req.Y < 0 || req.X >= 60 || req.Y >= 40 {
 			packet.Data = "{\"error\":\"Click is out of bounds\"}"
 			h.sendMessage( packet )
 			return

@@ -102,7 +102,11 @@ class Canvas {
 		this.layers.layer4.addEventListener('mousedown', function(e){
 			if(self.state.getActive() == window.activeClient){
 				var pos = self.getClickedCell(e)
-				window.sConn.send(JSON.stringify({type: "Click",x: pos.x, y: pos.y}))
+				if (pos.x < 0 || pos.y < 0 || pos.x >= 60 || pos.y >= 40){
+					appendMessage("Click was out of bounds")	
+				} else {
+					window.sConn.send(JSON.stringify({type: "Click",x: pos.x, y: pos.y}))
+				}
 			} else {
 				appendMessage("It is currently " + self.state.getActive() + "'s turn")
 			}
