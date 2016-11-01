@@ -47,6 +47,9 @@ function processPacket(parsedPacket){
 
 function appendMessage(message){
 	var history = $history
+	if (history.childNodes.length >= 100){
+		history.removeChild(history.firstChild)
+	}
 	var element = document.createElement('div')
 	var span = document.createElement('span')
 	element.classList.add("history-text")
@@ -80,6 +83,9 @@ function updateUserList(userList){
 
 function appendChatMessage(author, message){
 	var chatDisplay = $chatDisplay
+	if (chatDisplay.childNodes.length >= 100){
+		chatDisplay.removeChild(chatDisplay.firstChild)
+	}
 	var element = document.createElement('div')
 	var span = document.createElement('span')
 	element.classList.add('chat-message')
