@@ -53,6 +53,7 @@ func (h *Hub) connect(client *Client){
 	for i, v := range h.users.SafeList {
 		if v.Name == client.Tag {
 			// MARKER Server -> Client connected.
+			// TODO implement smart client connections to establish first player
 			h.users.SafeList[i].Status = "Online"
 			h.users.SafeList[i].Connections++
 			var pack Packet
@@ -76,6 +77,7 @@ func (h *Hub) disconnect(client *Client){
 	for i, v := range h.users.SafeList {
 		if v.Name == client.Tag {
 			// MARKER Server -> Client disconnected.
+			// TODO implement smart client connections to establish first player on disconnect as well
 			h.users.SafeList[i].Connections--
 			if h.users.SafeList[i].Connections <= 0 {
 				h.users.SafeList[i].Connections = 0

@@ -10,4 +10,6 @@ class Grid {
 			}
 		}
 	}
+
+	// TODO implement a method to import data sent via socket
 }
