@@ -48,6 +48,7 @@ function processPacket(parsedPacket){
 function appendMessage(message){
 	var history = $history
 	var element = document.createElement('div')
+	element.classList.add("history-text")
 	var textMessage = document.createTextNode(message)
 	element.appendChild(textMessage)
 	history.appendChild(element)
