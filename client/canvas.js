@@ -15,7 +15,7 @@ class Canvas {
 		this.buffer = 15
 		this.scale = scale
 		this.grid = new Grid(this.backgroundWidth, this.backgroundHeight, this.scale)
-		this.state = new State("John")
+		this.state = new State()
 
 		// MARKER Client -> Canvas init
 		this.layers = {

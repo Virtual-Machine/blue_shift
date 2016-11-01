@@ -13,13 +13,22 @@ var $minimapMap = document.getElementById('minimapMap')
 class State {
 	constructor(firstPlayer){
 		this.active = firstPlayer
+		this.started = false
 	}
 
 	getActive(){
-		return this.active
+		if (this.started){
+			return this.active
+		} else {
+			return "NOBODY"
+		}
 	}
 
 	setActive(player){
 		this.active = player 
+	}
+
+	start(){
+		this.started = true
 	}
 }
