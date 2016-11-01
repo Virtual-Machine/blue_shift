@@ -25,6 +25,7 @@ type User struct {
     Name      string `json:"name"`
     Password	string `json:"password"`
     Token		string `json:"token"`
+    Admin		bool   `json: "-"`
 }
 
 type UserList struct {
@@ -79,6 +80,7 @@ func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []
 		log.Fatal(err)
 	}
 	u.Token = tokenString
+	u.Admin = false
 	data.List = append(data.List, u)
 	var uSafe UserSafe
 	uSafe.Name = u.Name
