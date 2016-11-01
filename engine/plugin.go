@@ -3,6 +3,7 @@ package engine
 type Plugin interface {
 	ProcessClick(user string, x int, y int) (bool, error)
 	GetData(user string, request string) []byte
+	StartGame(players []string)
 }
 
 // If a game engine implements the above interface, it may be plugged into the server

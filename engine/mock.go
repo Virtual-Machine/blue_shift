@@ -16,6 +16,7 @@ type MapCell struct {
 
 type MockGameEngine struct {
 	Active string
+	Players []string
 	MapData [60][40]MapCell
 
 }
@@ -23,10 +24,14 @@ type MockGameEngine struct {
 var GameInstance MockGameEngine
 
 func init() {
-	GameInstance.Active = "John"
 	GameInstance.MapData[0][0].Background = "Grass"
 	GameInstance.MapData[0][0].Blocked = true
 	GameInstance.MapData[0][1].Clickable = true
+}
+
+func (g *MockGameEngine) StartGame(players []string) {
+	g.Players = players
+	g.Active = players[0]
 }
 
 func (g *MockGameEngine) ProcessClick(user string, x int, y int) (bool, error) {
