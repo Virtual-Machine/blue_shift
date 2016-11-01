@@ -232,3 +232,11 @@ html, body {
 	box-shadow: 0px 0px 2px 2px #070707 inset;
 	font-family: monaco;
 }
+
+.history-time {
+	color: #102d44;
+	font-size: 14px;
+	text-shadow: 1px 1px #05312d;
+	font-family: verdana;
+	font-weight: bold;
+}
