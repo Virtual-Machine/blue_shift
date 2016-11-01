@@ -102,15 +102,20 @@ func (h *Hub) intakeRequest(packet *Packet){
     }
     // MARKER Server -> Socket server received data from client.
     if req.Type == "Click" {
-    	validMove, err := engine.GameInstance.ProcessClick(packet.Id, req.X, req.Y)
-    	if validMove {
-    		packet.Data = string(engine.GameInstance.GetData(packet.Id, "MapData"))
-    		h.sendBroadcast( packet )
+		if req.X < 0 || req.Y < 0 || req.X > 60 || req.Y > 40 {
+			packet.Data = "{\"error\":\"Click is out of bounds\"}"
+			h.sendMessage( packet )
+			return
+		}
+		validMove, err := engine.GameInstance.ProcessClick(packet.Id, req.X, req.Y)
+		if validMove {
+			packet.Data = string(engine.GameInstance.GetData(packet.Id, "MapData"))
+			h.sendBroadcast( packet )
 		} else {
 			packet.Data = "{\"error\":\"" + err.Error() + "\"}"
 			h.sendMessage( packet )
 		}
-    }
+	}
 	if req.Type == "MapData" {
 		packet.Data = string(engine.GameInstance.GetData(packet.Id, "MapData"))
 		h.sendBroadcast( packet )

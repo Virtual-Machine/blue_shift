@@ -39,7 +39,7 @@ func (g *MockGameEngine) ProcessClick(user string, x int, y int) (bool, error) {
 	if g.MapData[x][y].Clickable {
 		return true, nil
 	}
-	return false, errors.New("Click was either out of bounds or the cell is not clickable")
+	return false, errors.New("Cell is not clickable")
 }
 
 func (g *MockGameEngine) GetData(user string, request string) []byte {
