@@ -7,6 +7,7 @@ var $history = document.getElementById('history')
 var $userList = document.getElementById('users')
 var $chatDisplay = document.getElementById('chatDisplay')
 var $minimapCursor = document.getElementById('minimapCursor')
+var $minimapMap = document.getElementById('minimapMap')
 
 
 class State {

@@ -112,6 +112,33 @@ class Canvas {
 			}
 		})
 
+		$minimapMap.addEventListener('click', function(e){
+			var rect = $minimapMap.getBoundingClientRect()
+			var posX = e.clientX - rect.left - (31.5)
+			var posY = e.clientY - rect.top - (16.5)
+			if (posX < 0) {
+				posX = 0
+			}
+			if(posY < 0){
+				posY = 0
+			}
+			if(posX > 187){
+				posX = 187
+			}
+			if(posY > 133.67){
+				posY = 133.67
+			}
+			$minimapCursor.style.left = posX + "px"
+			$minimapCursor.style.top = posY + "px"
+
+			var relX = posX / 187
+			var relY = posY / 133.67
+
+			self.deltaWX = (relX * -2870) + 15
+			self.deltaWY = (relY * -2055) + 15
+			self.drawGrid()
+		})
+
 		document.addEventListener('keydown', function(e){
 			if(e.which == 37){
 				self.deltaWX += 45
