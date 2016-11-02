@@ -2,19 +2,19 @@ package socket
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"net/http"
-	"time"
 	"strings"
-	"fmt"
+	"time"
 
-	"github.com/gorilla/websocket"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/websocket"
 )
 
 const (
 	writeWait = 10 * time.Second
-	pongWait = 60 * time.Second
+	pongWait  = 60 * time.Second
 
 	pingPeriod = (pongWait * 9) / 10
 
@@ -34,7 +34,7 @@ var upgrader = websocket.Upgrader{
 			return true
 		}
 		return false
-    },
+	},
 }
 
 type Client struct {
@@ -66,7 +66,7 @@ func (c *Client) readPump() {
 		var pack Packet
 		pack.Id = c.Tag
 		pack.Data = string(bytes.TrimSpace(bytes.Replace(message, newline, space, -1)))
-		
+
 		if c.hub.mode == "Debug" {
 			log.Println("Client socket is sending message to hub:", pack.Id)
 		}
@@ -121,10 +121,10 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request, api_key []byte) {
 	tokenString := r.URL.Query().Get("id")
 	var idString string
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-	    if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-	        return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-	    }
-	    return api_key, nil
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+		return api_key, nil
 	})
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {

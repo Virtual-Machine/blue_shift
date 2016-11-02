@@ -1,17 +1,17 @@
 package main
 
 import (
-    "log"
-    "net/http"
+	"log"
+	"net/http"
 
-    "./socket"
-    "./login"
-    "./config"
+	"./config"
+	"./login"
+	"./socket"
 )
 
 var data login.UserList
 
-func init(){
+func init() {
 	var u login.User
 	u.Name = "ADMIN"
 	u.Password = "Th3_D00d_1928!^^"
@@ -22,7 +22,7 @@ func init(){
 
 func main() {
 	log.SetFlags(log.Lshortfile)
-	
+
 	conf := config.DecodeConfiguration()
 
 	api_key := []byte(conf.SigningKey)
@@ -31,8 +31,8 @@ func main() {
 	go hub.Run()
 
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-        login.Api(&data, w, r, api_key, conf.Mode)
-    })
+		login.Api(&data, w, r, api_key, conf.Mode)
+	})
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		socket.ServeWs(hub, w, r, api_key)
@@ -42,5 +42,5 @@ func main() {
 	if conf.Mode == "Debug" {
 		log.Println("Blue Shift   ---Online---    localhost", conf.Port)
 	}
-    log.Fatal(http.ListenAndServe(conf.Port, nil))
+	log.Fatal(http.ListenAndServe(conf.Port, nil))
 }

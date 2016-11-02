@@ -1,32 +1,32 @@
 package socket
 
 import (
-	"log"
 	"encoding/json"
+	"log"
 
 	"../engine"
 	"../login"
 )
 
 type Hub struct {
-	clients map[*Client]bool
-	broadcast chan *Packet
-	request chan *Packet
-	register chan *Client
+	clients    map[*Client]bool
+	broadcast  chan *Packet
+	request    chan *Packet
+	register   chan *Client
 	unregister chan *Client
-	mode string
-	users *login.UserList
+	mode       string
+	users      *login.UserList
 }
 
 func NewHub(modeStr string, userList *login.UserList) *Hub {
 	return &Hub{
 		broadcast:  make(chan *Packet),
-		request:  	make(chan *Packet),
+		request:    make(chan *Packet),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		clients:    make(map[*Client]bool),
-		mode: 		modeStr,
-		users:		userList,
+		mode:       modeStr,
+		users:      userList,
 	}
 }
 
@@ -45,7 +45,7 @@ func (h *Hub) Run() {
 	}
 }
 
-func (h *Hub) connect(client *Client){
+func (h *Hub) connect(client *Client) {
 	if h.mode == "Debug" {
 		log.Println("Connecting socket @", client.conn.RemoteAddr(), client.Tag)
 	}
@@ -66,7 +66,7 @@ func (h *Hub) connect(client *Client){
 	}
 }
 
-func (h *Hub) disconnect(client *Client){
+func (h *Hub) disconnect(client *Client) {
 	if h.mode == "Debug" {
 		log.Println("Disconnecting socket @", client.conn.RemoteAddr(), client.Tag)
 	}
@@ -93,42 +93,42 @@ func (h *Hub) disconnect(client *Client){
 	}
 }
 
-func (h *Hub) intakeRequest(packet *Packet){
+func (h *Hub) intakeRequest(packet *Packet) {
 	if h.mode == "Debug" {
 		log.Println("Got packet: " + packet.Data + " From: " + packet.Id)
 	}
 	var req Request
 	if err := json.Unmarshal([]byte(packet.Data), &req); err != nil {
-	    log.Println("REQUEST ERROR!!! : ", err)
-	    return
-    }
-    // MARKER Server -> Socket server received data from client.
-    if req.Type == "Click" {
+		log.Println("REQUEST ERROR!!! : ", err)
+		return
+	}
+	// MARKER Server -> Socket server received data from client.
+	if req.Type == "Click" {
 		if req.X < 0 || req.Y < 0 || req.X >= 60 || req.Y >= 40 {
 			packet.Data = "{\"error\":\"Click is out of bounds\"}"
-			h.sendMessage( packet )
+			h.sendMessage(packet)
 			return
 		}
 		validMove, err := engine.GameInstance.ProcessClick(packet.Id, req.X, req.Y)
 		if validMove {
 			packet.Data = string(engine.GameInstance.GetData(packet.Id, "MapData"))
-			h.sendBroadcast( packet )
+			h.sendBroadcast(packet)
 		} else {
 			packet.Data = "{\"error\":\"" + err.Error() + "\"}"
-			h.sendMessage( packet )
+			h.sendMessage(packet)
 		}
 	}
 	if req.Type == "MapData" {
 		packet.Data = string(engine.GameInstance.GetData(packet.Id, "MapData"))
-		h.sendBroadcast( packet )
+		h.sendBroadcast(packet)
 	}
 	if req.Type == "ChatMessage" {
 		packet.Data = "{\"message\":\"" + req.Message + "\", \"author\": \"" + packet.Id + "\"}"
-		h.sendBroadcast( packet )
+		h.sendBroadcast(packet)
 	}
 }
 
-func (h *Hub) sendMessage(packet *Packet){
+func (h *Hub) sendMessage(packet *Packet) {
 	if h.mode == "Debug" {
 		log.Println("Sending message to : " + packet.Id)
 	}
@@ -150,7 +150,7 @@ func (h *Hub) sendMessage(packet *Packet){
 	}
 }
 
-func (h *Hub) sendBroadcast(packet *Packet){
+func (h *Hub) sendBroadcast(packet *Packet) {
 	if h.mode == "Debug" {
 		log.Println("Broadcasting from: " + packet.Id)
 	}

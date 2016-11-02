@@ -1,41 +1,41 @@
 package login
 
 import (
-	"net/http"
 	"encoding/json"
 	"log"
+	"net/http"
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
 type LoginResponse struct {
-	Type 	string
+	Type    string
 	Message string
-	Name 	string
+	Name    string
 }
 
 type UserSafe struct {
-	Name      string `json:"name"`
-	Status 		string `json:"status"`
+	Name        string `json:"name"`
+	Status      string `json:"status"`
 	Connections int    `json:"connections"`
 }
 
 type User struct {
-    Name      string `json:"name"`
-    Password	string `json:"password"`
-    Token		string `json:"token"`
-    Admin		bool   `json: "-"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
+	Token    string `json:"token"`
+	Admin    bool   `json: "-"`
 }
 
 type UserList struct {
-	List []User
+	List     []User
 	SafeList []UserSafe
 }
 
-func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []byte, mode string){
+func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []byte, mode string) {
 	var u User
-	
+
 	if r.Body == nil {
 		http.Error(w, "Please send a request body", 400)
 		return
@@ -72,7 +72,7 @@ func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []
 	}
 	// MARKER Server -> A new client is registering with server
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-	    "id": u.Name,
+		"id": u.Name,
 	})
 
 	tokenString, err := token.SignedString(mySigningKey)
@@ -93,7 +93,7 @@ func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []
 	sendSuccessResponse(w, u)
 }
 
-func sendSuccessResponse(w http.ResponseWriter, u User){
+func sendSuccessResponse(w http.ResponseWriter, u User) {
 	var res LoginResponse
 	res.Type = "Success"
 	res.Name = u.Name
@@ -101,7 +101,7 @@ func sendSuccessResponse(w http.ResponseWriter, u User){
 	json.NewEncoder(w).Encode(res)
 }
 
-func sendErrorResponse(w http.ResponseWriter, message string){
+func sendErrorResponse(w http.ResponseWriter, message string) {
 	var err LoginResponse
 	err.Type = "Error"
 	err.Message = message

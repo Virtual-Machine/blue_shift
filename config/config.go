@@ -1,15 +1,15 @@
 package config
 
 import (
-	"os"
 	"encoding/json"
 	"log"
+	"os"
 )
 
 type Configuration struct {
-    Mode    string
-    Port	string
-    SigningKey	string
+	Mode       string
+	Port       string
+	SigningKey string
 }
 
 func DecodeConfiguration() Configuration {
@@ -18,7 +18,7 @@ func DecodeConfiguration() Configuration {
 	conf := Configuration{}
 	err := decoder.Decode(&conf)
 	if err != nil {
-	  log.Fatal("Error:", err)
+		log.Fatal("Error:", err)
 	}
 	return conf
 }

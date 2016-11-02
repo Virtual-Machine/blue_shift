@@ -2,23 +2,22 @@ package engine
 
 import (
 	"encoding/json"
-	"log"
 	"errors"
+	"log"
 )
 
 type MapCell struct {
 	Background string
-	Item 	   string
+	Item       string
 	Character  string
-	Blocked	   bool
+	Blocked    bool
 	Clickable  bool
 }
 
 type MockGameEngine struct {
-	Active string
+	Active  string
 	Players []string
 	MapData [60][40]MapCell
-
 }
 
 var GameInstance MockGameEngine
