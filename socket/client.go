@@ -37,7 +37,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-type Client struct {
+type client struct {
 	hub *Hub
 
 	conn *websocket.Conn
@@ -47,7 +47,7 @@ type Client struct {
 	Tag string
 }
 
-func (c *Client) readPump() {
+func (c *client) readPump() {
 	defer func() {
 		c.hub.unregister <- c
 		c.conn.Close()
@@ -63,23 +63,23 @@ func (c *Client) readPump() {
 			}
 			break
 		}
-		var pack Packet
-		pack.Id = c.Tag
+		var pack packet
+		pack.ID = c.Tag
 		pack.Data = string(bytes.TrimSpace(bytes.Replace(message, newline, space, -1)))
 
 		if c.hub.mode == "Debug" {
-			log.Println("Client socket is sending message to hub:", pack.Id)
+			log.Println("Client socket is sending message to hub:", pack.ID)
 		}
 		c.hub.request <- &pack
 	}
 }
 
-func (c *Client) write(mt int, payload []byte) error {
+func (c *client) write(mt int, payload []byte) error {
 	c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 	return c.conn.WriteMessage(mt, payload)
 }
 
-func (c *Client) writePump() {
+func (c *client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
@@ -117,14 +117,15 @@ func (c *Client) writePump() {
 	}
 }
 
-func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request, api_key []byte) {
+// ServeWs establishes a socket connection between a client and the hub
+func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request, apiKey []byte) {
 	tokenString := r.URL.Query().Get("id")
 	var idString string
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-		return api_key, nil
+		return apiKey, nil
 	})
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
@@ -140,7 +141,7 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request, api_key []byte) {
 	if hub.mode == "Debug" {
 		log.Println("Successful socket connection established for user:", idString)
 	}
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), Tag: idString}
+	client := &client{hub: hub, conn: conn, send: make(chan []byte, 256), Tag: idString}
 	client.hub.register <- client
 	go client.writePump()
 	client.readPump()

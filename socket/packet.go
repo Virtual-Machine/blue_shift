@@ -1,6 +1,6 @@
 package socket
 
-type Packet struct {
-	Id   string `json:"id"`
+type packet struct {
+	ID   string `json:"id"`
 	Data string `json:"data"`
 }

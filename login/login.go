@@ -9,18 +9,19 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-type LoginResponse struct {
+type loginResponse struct {
 	Type    string
 	Message string
 	Name    string
 }
 
-type UserSafe struct {
+type userSafe struct {
 	Name        string `json:"name"`
 	Status      string `json:"status"`
 	Connections int    `json:"connections"`
 }
 
+// User stores the sensitive records of a user account
 type User struct {
 	Name     string `json:"name"`
 	Password string `json:"password"`
@@ -28,12 +29,14 @@ type User struct {
 	Admin    bool   `json: "-"`
 }
 
+// UserList is the servers array of user data
 type UserList struct {
 	List     []User
-	SafeList []UserSafe
+	SafeList []userSafe
 }
 
-func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []byte, mode string) {
+// API allows users to connect via an post submittal
+func API(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []byte, mode string) {
 	var u User
 
 	if r.Body == nil {
@@ -61,13 +64,12 @@ func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []
 				}
 				sendErrorResponse(w, "Password is not correct for this user account")
 				return
-			} else {
-				if mode == "Debug" {
-					log.Println("Successful login via API for account:", u.Name)
-				}
-				sendSuccessResponse(w, data.List[i])
-				return
 			}
+			if mode == "Debug" {
+				log.Println("Successful login via API for account:", u.Name)
+			}
+			sendSuccessResponse(w, data.List[i])
+			return
 		}
 	}
 	// MARKER Server -> A new client is registering with server
@@ -82,7 +84,7 @@ func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []
 	u.Token = tokenString
 	u.Admin = false
 	data.List = append(data.List, u)
-	var uSafe UserSafe
+	var uSafe userSafe
 	uSafe.Name = u.Name
 	uSafe.Status = "Offline"
 	uSafe.Connections = 0
@@ -94,7 +96,7 @@ func Api(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []
 }
 
 func sendSuccessResponse(w http.ResponseWriter, u User) {
-	var res LoginResponse
+	var res loginResponse
 	res.Type = "Success"
 	res.Name = u.Name
 	res.Message = u.Token
@@ -102,7 +104,7 @@ func sendSuccessResponse(w http.ResponseWriter, u User) {
 }
 
 func sendErrorResponse(w http.ResponseWriter, message string) {
-	var err LoginResponse
+	var err loginResponse
 	err.Type = "Error"
 	err.Message = message
 	json.NewEncoder(w).Encode(err)

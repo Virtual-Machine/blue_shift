@@ -8,28 +8,31 @@ import (
 	"../login"
 )
 
+// Hub is the default socker server struct
 type Hub struct {
-	clients    map[*Client]bool
-	broadcast  chan *Packet
-	request    chan *Packet
-	register   chan *Client
-	unregister chan *Client
+	clients    map[*client]bool
+	broadcast  chan *packet
+	request    chan *packet
+	register   chan *client
+	unregister chan *client
 	mode       string
 	users      *login.UserList
 }
 
+// NewHub provides a pointer to a new default socket server
 func NewHub(modeStr string, userList *login.UserList) *Hub {
 	return &Hub{
-		broadcast:  make(chan *Packet),
-		request:    make(chan *Packet),
-		register:   make(chan *Client),
-		unregister: make(chan *Client),
-		clients:    make(map[*Client]bool),
+		broadcast:  make(chan *packet),
+		request:    make(chan *packet),
+		register:   make(chan *client),
+		unregister: make(chan *client),
+		clients:    make(map[*client]bool),
 		mode:       modeStr,
 		users:      userList,
 	}
 }
 
+// Run initiates channels for actions
 func (h *Hub) Run() {
 	for {
 		select {
@@ -45,7 +48,7 @@ func (h *Hub) Run() {
 	}
 }
 
-func (h *Hub) connect(client *Client) {
+func (h *Hub) connect(client *client) {
 	if h.mode == "Debug" {
 		log.Println("Connecting socket @", client.conn.RemoteAddr(), client.Tag)
 	}
@@ -56,8 +59,8 @@ func (h *Hub) connect(client *Client) {
 			// TODO implement smart client connections to establish first player
 			h.users.SafeList[i].Status = "Online"
 			h.users.SafeList[i].Connections++
-			var pack Packet
-			pack.Id = client.Tag
+			var pack packet
+			pack.ID = client.Tag
 			data, _ := json.Marshal(h.users.SafeList)
 			pack.Data = "{\"user_list\": " + string(data) + "}"
 			h.sendBroadcast(&pack)
@@ -66,7 +69,7 @@ func (h *Hub) connect(client *Client) {
 	}
 }
 
-func (h *Hub) disconnect(client *Client) {
+func (h *Hub) disconnect(client *client) {
 	if h.mode == "Debug" {
 		log.Println("Disconnecting socket @", client.conn.RemoteAddr(), client.Tag)
 	}
@@ -83,8 +86,8 @@ func (h *Hub) disconnect(client *Client) {
 				h.users.SafeList[i].Connections = 0
 				h.users.SafeList[i].Status = "Offline"
 			}
-			var pack Packet
-			pack.Id = client.Tag
+			var pack packet
+			pack.ID = client.Tag
 			data, _ := json.Marshal(h.users.SafeList)
 			pack.Data = "{\"user_list\": " + string(data) + "}"
 			h.sendBroadcast(&pack)
@@ -93,11 +96,11 @@ func (h *Hub) disconnect(client *Client) {
 	}
 }
 
-func (h *Hub) intakeRequest(packet *Packet) {
+func (h *Hub) intakeRequest(packet *packet) {
 	if h.mode == "Debug" {
-		log.Println("Got packet: " + packet.Data + " From: " + packet.Id)
+		log.Println("Got packet: " + packet.Data + " From: " + packet.ID)
 	}
-	var req Request
+	var req request
 	if err := json.Unmarshal([]byte(packet.Data), &req); err != nil {
 		log.Println("REQUEST ERROR!!! : ", err)
 		return
@@ -109,9 +112,9 @@ func (h *Hub) intakeRequest(packet *Packet) {
 			h.sendMessage(packet)
 			return
 		}
-		validMove, err := engine.GameInstance.ProcessClick(packet.Id, req.X, req.Y)
+		validMove, err := engine.GameInstance.ProcessClick(packet.ID, req.X, req.Y)
 		if validMove {
-			packet.Data = string(engine.GameInstance.GetData(packet.Id, "MapData"))
+			packet.Data = string(engine.GameInstance.GetData(packet.ID, "MapData"))
 			h.sendBroadcast(packet)
 		} else {
 			packet.Data = "{\"error\":\"" + err.Error() + "\"}"
@@ -119,21 +122,21 @@ func (h *Hub) intakeRequest(packet *Packet) {
 		}
 	}
 	if req.Type == "MapData" {
-		packet.Data = string(engine.GameInstance.GetData(packet.Id, "MapData"))
+		packet.Data = string(engine.GameInstance.GetData(packet.ID, "MapData"))
 		h.sendBroadcast(packet)
 	}
 	if req.Type == "ChatMessage" {
-		packet.Data = "{\"message\":\"" + req.Message + "\", \"author\": \"" + packet.Id + "\"}"
+		packet.Data = "{\"message\":\"" + req.Message + "\", \"author\": \"" + packet.ID + "\"}"
 		h.sendBroadcast(packet)
 	}
 }
 
-func (h *Hub) sendMessage(packet *Packet) {
+func (h *Hub) sendMessage(packet *packet) {
 	if h.mode == "Debug" {
-		log.Println("Sending message to : " + packet.Id)
+		log.Println("Sending message to : " + packet.ID)
 	}
 	for client := range h.clients {
-		if client.Tag == packet.Id {
+		if client.Tag == packet.ID {
 			select {
 			case client.send <- []byte(packet.Data):
 				if h.mode == "Debug" {
@@ -150,9 +153,9 @@ func (h *Hub) sendMessage(packet *Packet) {
 	}
 }
 
-func (h *Hub) sendBroadcast(packet *Packet) {
+func (h *Hub) sendBroadcast(packet *packet) {
 	if h.mode == "Debug" {
-		log.Println("Broadcasting from: " + packet.Id)
+		log.Println("Broadcasting from: " + packet.ID)
 	}
 	for client := range h.clients {
 		select {

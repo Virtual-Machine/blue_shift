@@ -25,17 +25,17 @@ func main() {
 
 	conf := config.DecodeConfiguration()
 
-	api_key := []byte(conf.SigningKey)
+	apiKey := []byte(conf.SigningKey)
 
 	hub := socket.NewHub(conf.Mode, &data)
 	go hub.Run()
 
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		login.Api(&data, w, r, api_key, conf.Mode)
+		login.API(&data, w, r, apiKey, conf.Mode)
 	})
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		socket.ServeWs(hub, w, r, api_key)
+		socket.ServeWs(hub, w, r, apiKey)
 	})
 
 	http.Handle("/", http.FileServer(http.Dir("./client/")))

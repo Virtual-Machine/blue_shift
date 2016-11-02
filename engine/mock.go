@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-type MapCell struct {
+type mapCell struct {
 	Background string
 	Item       string
 	Character  string
@@ -14,13 +14,14 @@ type MapCell struct {
 	Clickable  bool
 }
 
-type MockGameEngine struct {
+type mockGameEngine struct {
 	Active  string
 	Players []string
-	MapData [60][40]MapCell
+	MapData [60][40]mapCell
 }
 
-var GameInstance MockGameEngine
+// GameInstance is the interface point of the socket server
+var GameInstance mockGameEngine
 
 func init() {
 	GameInstance.MapData[0][0].Background = "Grass"
@@ -28,12 +29,12 @@ func init() {
 	GameInstance.MapData[0][1].Clickable = true
 }
 
-func (g *MockGameEngine) StartGame(players []string) {
+func (g *mockGameEngine) StartGame(players []string) {
 	g.Players = players
 	g.Active = players[0]
 }
 
-func (g *MockGameEngine) ProcessClick(user string, x int, y int) (bool, error) {
+func (g *mockGameEngine) ProcessClick(user string, x int, y int) (bool, error) {
 	if user != g.Active {
 		return false, errors.New("User is not active")
 	}
@@ -46,7 +47,7 @@ func (g *MockGameEngine) ProcessClick(user string, x int, y int) (bool, error) {
 	return false, errors.New("Cell is not clickable")
 }
 
-func (g *MockGameEngine) GetData(user string, request string) []byte {
+func (g *mockGameEngine) GetData(user string, request string) []byte {
 	if request == "MapData" {
 		blob, err := json.Marshal(g.MapData)
 		if err != nil {
