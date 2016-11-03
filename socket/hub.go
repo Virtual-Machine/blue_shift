@@ -18,6 +18,7 @@ type Hub struct {
 	unregister chan *client
 	mode       string
 	users      *login.UserList
+	started    bool
 }
 
 // NewHub provides a pointer to a new default socket server
@@ -30,6 +31,7 @@ func NewHub(modeStr string, userList *login.UserList) *Hub {
 		clients:    make(map[*client]bool),
 		mode:       modeStr,
 		users:      userList,
+		started:    false,
 	}
 }
 
@@ -130,6 +132,11 @@ func (h *Hub) intakeRequest(packet *packet) {
 		return
 	}
 	if req.Type == "StartGame" {
+		if h.started {
+			packet.Data = "{\"admin_error\":\"This server is already running a game\"}"
+			h.sendMessage(packet)
+			return
+		}
 		for _, v := range h.users.List {
 			if v.Name == packet.ID && v.Admin == true {
 				names := strings.Split(req.Message, ";")
@@ -153,6 +160,7 @@ func (h *Hub) intakeRequest(packet *packet) {
 					}
 				}
 				engine.GameInstance.StartGame(names)
+				h.started = true
 				jnames, _ := json.Marshal(names)
 				packet.Data = "{\"success\":\"Game Started\", \"players\":" + string(jnames) + "}"
 				h.sendBroadcast(packet)
