@@ -15,7 +15,8 @@ type loginResponse struct {
 	Name    string
 }
 
-type userSafe struct {
+// UserSafe is the client safe data of the user
+type UserSafe struct {
 	Name        string `json:"name"`
 	Status      string `json:"status"`
 	Connections int    `json:"connections"`
@@ -32,7 +33,7 @@ type User struct {
 // UserList is the servers array of user data
 type UserList struct {
 	List     []User
-	SafeList []userSafe
+	SafeList []UserSafe
 }
 
 // API allows users to connect via an post submittal
@@ -84,7 +85,7 @@ func API(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []
 	u.Token = tokenString
 	u.Admin = false
 	data.List = append(data.List, u)
-	var uSafe userSafe
+	var uSafe UserSafe
 	uSafe.Name = u.Name
 	uSafe.Status = "Offline"
 	uSafe.Connections = 0

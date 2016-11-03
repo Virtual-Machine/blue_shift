@@ -35,7 +35,7 @@ func main() {
 	})
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		socket.ServeWs(hub, w, r, apiKey)
+		socket.ServeWs(&data, hub, w, r, apiKey)
 	})
 
 	http.Handle("/", http.FileServer(http.Dir("./client/")))

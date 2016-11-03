@@ -51,47 +51,43 @@ func (h *Hub) Run() {
 
 func (h *Hub) connect(client *client) {
 	if h.mode == "Debug" {
-		log.Println("Connecting socket @", client.conn.RemoteAddr(), client.Tag)
+		log.Println("Connecting socket @", client.conn.RemoteAddr(), client.user.Name)
 	}
 	h.clients[client] = true
-	for i, v := range h.users.SafeList {
-		if v.Name == client.Tag {
-			// MARKER Server -> Client connected.
-			h.users.SafeList[i].Status = "Online"
-			h.users.SafeList[i].Connections++
-			var pack packet
-			pack.ID = client.Tag
-			data, _ := json.Marshal(h.users.SafeList)
-			pack.Data = "{\"user_list\": " + string(data) + "}"
-			h.sendBroadcast(&pack)
-			return
-		}
+	if client.userSafe != nil {
+		// MARKER Server -> Client connected.
+		client.userSafe.Status = "Online"
+		client.userSafe.Connections++
+		var pack packet
+		pack.ID = client.user.Name
+		data, _ := json.Marshal(h.users.SafeList)
+		pack.Data = "{\"user_list\": " + string(data) + "}"
+		h.sendBroadcast(&pack)
+		return
 	}
 }
 
 func (h *Hub) disconnect(client *client) {
 	if h.mode == "Debug" {
-		log.Println("Disconnecting socket @", client.conn.RemoteAddr(), client.Tag)
+		log.Println("Disconnecting socket @", client.conn.RemoteAddr(), client.user.Name)
 	}
 	if _, ok := h.clients[client]; ok {
 		delete(h.clients, client)
 		close(client.send)
 	}
-	for i, v := range h.users.SafeList {
-		if v.Name == client.Tag {
-			// MARKER Server -> Client disconnected.
-			h.users.SafeList[i].Connections--
-			if h.users.SafeList[i].Connections <= 0 {
-				h.users.SafeList[i].Connections = 0
-				h.users.SafeList[i].Status = "Offline"
-			}
-			var pack packet
-			pack.ID = client.Tag
-			data, _ := json.Marshal(h.users.SafeList)
-			pack.Data = "{\"user_list\": " + string(data) + "}"
-			h.sendBroadcast(&pack)
-			return
+	if client.userSafe != nil {
+		// MARKER Server -> Client disconnected.
+		client.userSafe.Connections--
+		if client.userSafe.Connections <= 0 {
+			client.userSafe.Connections = 0
+			client.userSafe.Status = "Offline"
 		}
+		var pack packet
+		pack.ID = client.user.Name
+		data, _ := json.Marshal(h.users.SafeList)
+		pack.Data = "{\"user_list\": " + string(data) + "}"
+		h.sendBroadcast(&pack)
+		return
 	}
 }
 
@@ -168,11 +164,11 @@ func (h *Hub) sendMessage(packet *packet) {
 		log.Println("Sending message to : " + packet.ID)
 	}
 	for client := range h.clients {
-		if client.Tag == packet.ID {
+		if client.user.Name == packet.ID {
 			select {
 			case client.send <- []byte(packet.Data):
 				if h.mode == "Debug" {
-					log.Println(client.conn.RemoteAddr(), client.Tag, "received data")
+					log.Println(client.conn.RemoteAddr(), client.user.Name, "received data")
 				}
 			default:
 				if h.mode == "Debug" {
@@ -193,7 +189,7 @@ func (h *Hub) sendBroadcast(packet *packet) {
 		select {
 		case client.send <- []byte(packet.Data):
 			if h.mode == "Debug" {
-				log.Println(client.conn.RemoteAddr(), client.Tag, "received data")
+				log.Println(client.conn.RemoteAddr(), client.user.Name, "received data")
 			}
 		default:
 			if h.mode == "Debug" {

@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"../login"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/websocket"
 )
@@ -44,7 +46,8 @@ type client struct {
 
 	send chan []byte
 
-	Tag string
+	userSafe *login.UserSafe
+	user     *login.User
 }
 
 func (c *client) readPump() {
@@ -64,7 +67,7 @@ func (c *client) readPump() {
 			break
 		}
 		var pack packet
-		pack.ID = c.Tag
+		pack.ID = c.user.Name
 		pack.Data = string(bytes.TrimSpace(bytes.Replace(message, newline, space, -1)))
 
 		if c.hub.mode == "Debug" {
@@ -118,7 +121,7 @@ func (c *client) writePump() {
 }
 
 // ServeWs establishes a socket connection between a client and the hub
-func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request, apiKey []byte) {
+func ServeWs(data *login.UserList, hub *Hub, w http.ResponseWriter, r *http.Request, apiKey []byte) {
 	tokenString := r.URL.Query().Get("id")
 	var idString string
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -141,7 +144,19 @@ func ServeWs(hub *Hub, w http.ResponseWriter, r *http.Request, apiKey []byte) {
 	if hub.mode == "Debug" {
 		log.Println("Successful socket connection established for user:", idString)
 	}
-	client := &client{hub: hub, conn: conn, send: make(chan []byte, 256), Tag: idString}
+	var userPointer *login.User
+	var userSafePointer *login.UserSafe
+	for i, v := range data.List {
+		if v.Name == idString {
+			userPointer = &data.List[i]
+		}
+	}
+	for i, v := range data.SafeList {
+		if v.Name == idString {
+			userSafePointer = &data.SafeList[i]
+		}
+	}
+	client := &client{hub: hub, conn: conn, send: make(chan []byte, 256), user: userPointer, userSafe: userSafePointer}
 	client.hub.register <- client
 	go client.writePump()
 	client.readPump()
