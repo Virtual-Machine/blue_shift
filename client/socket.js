@@ -34,20 +34,30 @@ function establishSocketConnection(token) {
 }
 
 function processPacket(parsedPacket){
+	if(parsedPacket.display_admin_panel){
+		$adminPanel.style.display = "block"
+		updateUserList(parsedPacket.user_list)
+		return
+	}
 	if(parsedPacket.user_list){
 		updateUserList(parsedPacket.user_list)
+		return
 	}
 	if(parsedPacket.author){
 		appendChatMessage(parsedPacket.author, parsedPacket.message)
+		return
 	}
 	if(parsedPacket.error){
 		appendMessage(parsedPacket.error)
+		return
 	}
 	if(parsedPacket.success){
 		appendMessage(parsedPacket.success)
+		return
 	}
-	if(parsedPacket.display_admin_panel){
-		$adminPanel.style.display = "block"
+	if(parsedPacket.admin_error){
+		appendAdminMessage(parsedPacket.admin_error)
+		return
 	}
 }
 
@@ -70,6 +80,7 @@ function appendMessage(message){
 
 function updateUserList(userList){
 	var user_list = $userList
+	$adminUserList.innerHTML = ""
 	user_list.innerHTML = ""
 	for(var i in userList){
 		var active = userList[i].name === window.activeClient
@@ -84,6 +95,16 @@ function updateUserList(userList){
 		span.textContent = status
 		element.appendChild(span)
 		user_list.appendChild(element)
+
+		if(userList[i].status === "Online"){
+			var userItem = document.createElement('div')
+			var text = document.createTextNode(userList[i].name)
+			userItem.appendChild(text)
+			userItem.setAttribute("draggable", true)
+			userItem.classList.add('choice')
+			userItem.addEventListener('dragstart', drag)
+			$adminUserList.appendChild(userItem)
+		}
 	}
 }
 

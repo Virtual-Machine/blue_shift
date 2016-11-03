@@ -14,7 +14,7 @@ var data login.UserList
 func init() {
 	var u login.User
 	u.Name = "ADMIN"
-	u.Password = "Th3_D00d_1928!^^"
+	u.Password = "aa"
 	u.Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkFETUlOIn0.vYW2lGzXBJzsDp6hmTI3sqUbRFT98-q4rSj1V4fSfLo"
 	u.Admin = true
 	data.List = append(data.List, u)

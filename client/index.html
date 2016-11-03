@@ -34,8 +34,24 @@
 	</div>
 	<div id="adminPanel">
 		<h3>Admin Panel</h3>
+		<p id="adminMessage">Drag 2-4 Player Names Into The Relevant Slots And Click Submit To Begin A Game</p>
+		<div id="adminUserList">
+			
+		</div>
+		<div id="adminSelects">
+			<label for="p1">Player 1</label>
+			<input id="p1" name="p1" type="text" disabled="true" ondrop="drop(event)" ondragover="allowDrop(event)">
+			<label for="p2">Player 2</label>
+			<input id="p2" name="p2" type="text" disabled="true" ondrop="drop(event)" ondragover="allowDrop(event)">
+			<label for="p3">Player 3</label>
+			<input id="p3" name="p3" type="text" disabled="true" ondrop="drop(event)" ondragover="allowDrop(event)">
+			<label for="p4">Player 4</label>
+			<input id="p4" name="p4" type="text" disabled="true" ondrop="drop(event)" ondragover="allowDrop(event)">
+			<button id="adminSubmit">Submit</button>
+		</div>
 	</div>
 	<script src="./state.js"></script>
+	<script src="./admin.js"></script>
 	<script src="./login.js"></script>
 	<script src="./sprite.js"></script>
 	<script src="./coordinate.js"></script>

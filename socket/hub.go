@@ -58,7 +58,10 @@ func (h *Hub) connect(client *client) {
 	if client.user.Admin {
 		var pack packet
 		pack.ID = client.user.Name
-		pack.Data = "{\"display_admin_panel\":\"true\"}"
+
+		data, _ := json.Marshal(h.users.SafeList)
+		pack.Data = "{\"display_admin_panel\":\"true\", \"user_list\": " + string(data) + "}"
+
 		h.sendMessage(&pack)
 		return
 	}
@@ -132,7 +135,7 @@ func (h *Hub) intakeRequest(packet *packet) {
 				names := strings.Split(req.Message, "")
 				count := len(names)
 				if count < 2 || count > 4 {
-					packet.Data = "{\"error\":\"This server is setup to only support 2-4 players\"}"
+					packet.Data = "{\"admin_error\":\"This server is setup to only support 2-4 players\"}"
 					h.sendMessage(packet)
 					return
 				}
@@ -144,7 +147,7 @@ func (h *Hub) intakeRequest(packet *packet) {
 						}
 					}
 					if !found {
-						packet.Data = "{\"error\":\"Submitted name: " + name + " not found on server\"}"
+						packet.Data = "{\"admin_error\":\"Submitted name: " + name + " not found on server\"}"
 						h.sendMessage(packet)
 						return
 					}
