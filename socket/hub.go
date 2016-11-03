@@ -3,6 +3,7 @@ package socket
 import (
 	"encoding/json"
 	"log"
+	"strings"
 
 	"../engine"
 	"../login"
@@ -119,6 +120,29 @@ func (h *Hub) intakeRequest(packet *packet) {
 		} else {
 			packet.Data = "{\"error\":\"" + err.Error() + "\"}"
 			h.sendMessage(packet)
+		}
+	}
+	if req.Type == "StartGame" {
+		for _, v := range h.users.List {
+			if v.Name == packet.ID && v.Admin == true {
+				names := strings.Split(req.Message, "")
+				count := len(names)
+				if count < 2 || count > 4 {
+					// TODO send error to ADMIN that only 2-4 players supported
+				}
+				for _, name := range names {
+					found := false
+					for _, v2 := range h.users.List {
+						if v2.Name == name {
+							found = true
+						}
+					}
+					if !found {
+						// TODO send error to ADMIN that user not found.
+					}
+				}
+				// TODO start engine and send success message to ADMIN
+			}
 		}
 	}
 	if req.Type == "MapData" {
