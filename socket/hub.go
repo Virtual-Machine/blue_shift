@@ -153,7 +153,8 @@ func (h *Hub) intakeRequest(packet *packet) {
 					}
 				}
 				engine.GameInstance.StartGame(names)
-				packet.Data = "{\"success\":\"Game Started\"}"
+				jnames, _ := json.Marshal(names)
+				packet.Data = "{\"success\":\"Game Started\", \"players\":" + string(jnames) + "}"
 				h.sendBroadcast(packet)
 				return
 			}

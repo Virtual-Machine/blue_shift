@@ -52,7 +52,8 @@ function processPacket(parsedPacket){
 		return
 	}
 	if(parsedPacket.success){
-		appendMessage(parsedPacket.success)
+		appendMessage(parsedPacket.success, parsedPacket.players)
+		$adminPanel.style.display = "none"
 		return
 	}
 	if(parsedPacket.admin_error){
@@ -61,7 +62,7 @@ function processPacket(parsedPacket){
 	}
 }
 
-function appendMessage(message){
+function appendMessage(message, players){
 	var history = $history
 	if (history.childNodes.length >= 100){
 		history.removeChild(history.firstChild)
@@ -72,6 +73,11 @@ function appendMessage(message){
 	span.classList.add("history-time")
 	span.textContent = new Date().toTimeString().split(" ")[0] + " - "
 	element.appendChild(span)
+	if (players){
+		for(var i in players){
+			message += " p" + (1 + parseInt(i)) + " : " + players[i]
+		}
+	}
 	var textMessage = document.createTextNode(message)
 	element.appendChild(textMessage)
 	history.appendChild(element)
