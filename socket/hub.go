@@ -114,21 +114,14 @@ func (h *Hub) intakeRequest(packet *packet) {
 		log.Println("REQUEST ERROR!!! : ", err)
 		return
 	}
+
+	h.processRequest(packet, req)
+}
+
+func (h *Hub) processRequest(packet *packet, req request) {
 	// MARKER Server -> Socket server received data from client.
 	if req.Type == "Click" {
-		if req.X < 0 || req.Y < 0 || req.X >= 60 || req.Y >= 40 {
-			packet.Data = "{\"error\":\"Click is out of bounds\"}"
-			h.sendMessage(packet)
-			return
-		}
-		validMove, err := engine.GameInstance.ProcessClick(packet.ID, req.X, req.Y)
-		if validMove {
-			packet.Data = string(engine.GameInstance.GetData(packet.ID, "MapData"))
-			h.sendBroadcast(packet)
-			return
-		}
-		packet.Data = "{\"error\":\"" + err.Error() + "\"}"
-		h.sendMessage(packet)
+		h.processClick(packet, req)
 		return
 	}
 	if req.Type == "StartGame" {
@@ -137,36 +130,8 @@ func (h *Hub) intakeRequest(packet *packet) {
 			h.sendMessage(packet)
 			return
 		}
-		for _, v := range h.users.List {
-			if v.Name == packet.ID && v.Admin == true {
-				names := strings.Split(req.Message, ";")
-				count := len(names)
-				if count < 2 || count > 4 {
-					packet.Data = "{\"admin_error\":\"This server is setup to only support 2-4 players\"}"
-					h.sendMessage(packet)
-					return
-				}
-				for _, name := range names {
-					found := false
-					for _, v2 := range h.users.List {
-						if v2.Name == name {
-							found = true
-						}
-					}
-					if !found {
-						packet.Data = "{\"admin_error\":\"Submitted name: " + name + " not found on server\"}"
-						h.sendMessage(packet)
-						return
-					}
-				}
-				engine.GameInstance.StartGame(names)
-				h.started = true
-				jnames, _ := json.Marshal(names)
-				packet.Data = "{\"success\":\"Game Started\", \"players\":" + string(jnames) + "}"
-				h.sendBroadcast(packet)
-				return
-			}
-		}
+		h.processStart(packet, req)
+		return
 	}
 	if req.Type == "MapData" {
 		packet.Data = string(engine.GameInstance.GetData(packet.ID, "MapData"))
@@ -218,6 +183,55 @@ func (h *Hub) sendBroadcast(packet *packet) {
 			}
 			close(client.send)
 			delete(h.clients, client)
+		}
+	}
+}
+
+func (h *Hub) processClick(p *packet, r request) {
+	if r.X < 0 || r.Y < 0 || r.X >= 60 || r.Y >= 40 {
+		p.Data = "{\"error\":\"Click is out of bounds\"}"
+		h.sendMessage(p)
+		return
+	}
+	validMove, err := engine.GameInstance.ProcessClick(p.ID, r.X, r.Y)
+	if validMove {
+		p.Data = string(engine.GameInstance.GetData(p.ID, "MapData"))
+		h.sendBroadcast(p)
+		return
+	}
+	p.Data = "{\"error\":\"" + err.Error() + "\"}"
+	h.sendMessage(p)
+}
+
+func (h *Hub) processStart(p *packet, r request) {
+	for _, v := range h.users.List {
+		if v.Name == p.ID && v.Admin == true {
+			names := strings.Split(r.Message, ";")
+			count := len(names)
+			if count < 2 || count > 4 {
+				p.Data = "{\"admin_error\":\"This server is setup to only support 2-4 players\"}"
+				h.sendMessage(p)
+				return
+			}
+			for _, name := range names {
+				found := false
+				for _, v2 := range h.users.List {
+					if v2.Name == name {
+						found = true
+					}
+				}
+				if !found {
+					p.Data = "{\"admin_error\":\"Submitted name: " + name + " not found on server\"}"
+					h.sendMessage(p)
+					return
+				}
+			}
+			engine.GameInstance.StartGame(names)
+			h.started = true
+			jnames, _ := json.Marshal(names)
+			p.Data = "{\"success\":\"Game Started\", \"players\":" + string(jnames) + "}"
+			h.sendBroadcast(p)
+			return
 		}
 	}
 }
