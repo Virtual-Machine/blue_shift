@@ -56,7 +56,7 @@ function processPacket(parsedPacket){
 		return
 	}
 	if(parsedPacket.admin_error){
-		appendAdminMessage(parsedPacket.admin_error)
+		displayAdminMessage(parsedPacket.admin_error)
 		return
 	}
 }
@@ -106,6 +106,10 @@ function updateUserList(userList){
 			$adminUserList.appendChild(userItem)
 		}
 	}
+}
+
+function displayAdminMessage(message){
+	$adminMessage.textContent = message
 }
 
 function appendChatMessage(author, message){

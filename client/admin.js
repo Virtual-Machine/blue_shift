@@ -31,3 +31,23 @@ function drop(ev) {
     var data = ev.dataTransfer.getData("text")
     ev.target.value = data
 }
+
+function adminClear(){
+	$p1.value = ""
+	$p2.value = ""
+	$p3.value = ""
+	$p4.value = ""
+}
+
+function adminSubmit(){
+	var sendString = ""
+	var names = [$p1.value, $p2.value, $p3.value, $p4.value]
+	for(var i in names){
+		if(names[i].trim().length > 0){
+			sendString += ";" + names[i]
+		}
+	}
+	sendString = sendString.substring(1)
+	console.log(sendString)
+	window.sConn.send(JSON.stringify({type: "StartGame",message: sendString}))
+}

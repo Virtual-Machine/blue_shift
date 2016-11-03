@@ -132,7 +132,7 @@ func (h *Hub) intakeRequest(packet *packet) {
 	if req.Type == "StartGame" {
 		for _, v := range h.users.List {
 			if v.Name == packet.ID && v.Admin == true {
-				names := strings.Split(req.Message, "")
+				names := strings.Split(req.Message, ";")
 				count := len(names)
 				if count < 2 || count > 4 {
 					packet.Data = "{\"admin_error\":\"This server is setup to only support 2-4 players\"}"

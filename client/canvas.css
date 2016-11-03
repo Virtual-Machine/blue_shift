@@ -281,9 +281,18 @@ html, body {
 	text-align: center;
 }
 
+#adminClear {
+	background-color: rgb(75, 25, 0);
+	margin-top: 10px;
+	color: white;
+	border: none;
+	width: 200px;
+	height: 40px;
+}
+
 #adminSubmit {
 	background-color: rgb(0, 75, 0);
-	margin-left: 246px;
+	margin-left: 40px;
 	margin-top: 10px;
 	color: white;
 	border: none;
