@@ -117,10 +117,11 @@ func (h *Hub) intakeRequest(packet *packet) {
 		if validMove {
 			packet.Data = string(engine.GameInstance.GetData(packet.ID, "MapData"))
 			h.sendBroadcast(packet)
-		} else {
-			packet.Data = "{\"error\":\"" + err.Error() + "\"}"
-			h.sendMessage(packet)
+			return
 		}
+		packet.Data = "{\"error\":\"" + err.Error() + "\"}"
+		h.sendMessage(packet)
+		return
 	}
 	if req.Type == "StartGame" {
 		for _, v := range h.users.List {
@@ -128,7 +129,9 @@ func (h *Hub) intakeRequest(packet *packet) {
 				names := strings.Split(req.Message, "")
 				count := len(names)
 				if count < 2 || count > 4 {
-					// TODO send error to ADMIN that only 2-4 players supported
+					packet.Data = "{\"error\":\"This server is setup to only support 2-4 players\"}"
+					h.sendMessage(packet)
+					return
 				}
 				for _, name := range names {
 					found := false
@@ -138,20 +141,27 @@ func (h *Hub) intakeRequest(packet *packet) {
 						}
 					}
 					if !found {
-						// TODO send error to ADMIN that user not found.
+						packet.Data = "{\"error\":\"Submitted name: " + name + " not found on server\"}"
+						h.sendMessage(packet)
+						return
 					}
 				}
-				// TODO start engine and send success message to ADMIN
+				engine.GameInstance.StartGame(names)
+				packet.Data = "{\"success\":\"Game Started\"}"
+				h.sendBroadcast(packet)
+				return
 			}
 		}
 	}
 	if req.Type == "MapData" {
 		packet.Data = string(engine.GameInstance.GetData(packet.ID, "MapData"))
 		h.sendBroadcast(packet)
+		return
 	}
 	if req.Type == "ChatMessage" {
 		packet.Data = "{\"message\":\"" + req.Message + "\", \"author\": \"" + packet.ID + "\"}"
 		h.sendBroadcast(packet)
+		return
 	}
 }
 
