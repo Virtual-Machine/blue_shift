@@ -43,6 +43,9 @@ function processPacket(parsedPacket){
 	if(parsedPacket.error){
 		appendMessage(parsedPacket.error)
 	}
+	if(parsedPacket.success){
+		appendMessage(parsedPacket.success)
+	}
 }
 
 function appendMessage(message){
