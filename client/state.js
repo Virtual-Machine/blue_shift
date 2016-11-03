@@ -8,6 +8,7 @@ var $userList = document.getElementById('users')
 var $chatDisplay = document.getElementById('chatDisplay')
 var $minimapCursor = document.getElementById('minimapCursor')
 var $minimapMap = document.getElementById('minimapMap')
+var $adminPanel = document.getElementById('adminPanel')
 
 
 class State {

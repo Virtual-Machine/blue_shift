@@ -46,6 +46,9 @@ function processPacket(parsedPacket){
 	if(parsedPacket.success){
 		appendMessage(parsedPacket.success)
 	}
+	if(parsedPacket.display_admin_panel){
+		$adminPanel.style.display = "block"
+	}
 }
 
 function appendMessage(message){

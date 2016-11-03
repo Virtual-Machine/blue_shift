@@ -240,3 +240,17 @@ html, body {
 	font-family: verdana;
 	font-weight: bold;
 }
+
+#adminPanel {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 1000px;
+	height: 535px;
+	background-color: rgba(0, 15, 0, 1);
+	z-index: 10;
+	color: whitesmoke;
+	padding: 30px;
+	box-sizing: border-box;
+	display: none;
+}

@@ -54,6 +54,15 @@ func (h *Hub) connect(client *client) {
 		log.Println("Connecting socket @", client.conn.RemoteAddr(), client.user.Name)
 	}
 	h.clients[client] = true
+
+	if client.user.Admin {
+		var pack packet
+		pack.ID = client.user.Name
+		pack.Data = "{\"display_admin_panel\":\"true\"}"
+		h.sendMessage(&pack)
+		return
+	}
+
 	if client.userSafe != nil {
 		// MARKER Server -> Client connected.
 		client.userSafe.Status = "Online"
