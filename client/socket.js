@@ -54,6 +54,8 @@ function processPacket(parsedPacket){
 	if(parsedPacket.success){
 		appendMessage(parsedPacket.success, parsedPacket.players)
 		$adminPanel.style.display = "none"
+		window.canvas.state.setActive(parsedPacket.players[0])
+		window.canvas.state.start()
 		return
 	}
 	if(parsedPacket.admin_error){
