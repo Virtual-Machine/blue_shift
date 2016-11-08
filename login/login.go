@@ -1,12 +1,15 @@
 package login
 
 import (
+	"bytes"
 	"encoding/json"
 	"log"
 	"net/http"
 	"strings"
 
+	"github.com/boltdb/bolt"
 	"github.com/dgrijalva/jwt-go"
+	"golang.org/x/crypto/scrypt"
 )
 
 type loginResponse struct {
@@ -27,7 +30,8 @@ type User struct {
 	Name     string `json:"name"`
 	Password string `json:"password"`
 	Token    string `json:"token"`
-	Admin    bool   `json: "-"`
+	Admin    bool   `json:"admin"`
+	Hashed   []byte `json:"hashed"`
 }
 
 // UserList is the servers array of user data
@@ -37,7 +41,7 @@ type UserList struct {
 }
 
 // API allows users to connect via an post submittal
-func API(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []byte, mode string) {
+func API(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []byte, mode string, db *bolt.DB) {
 	var u User
 
 	if r.Body == nil {
@@ -53,13 +57,21 @@ func API(data *UserList, w http.ResponseWriter, r *http.Request, mySigningKey []
 		if mode == "Debug" {
 			log.Println("User submitted only whitespace for username and/or password")
 		}
-		sendErrorResponse(w, "Username / Password cannot consist of whitespace characters")
+		sendErrorResponse(w, "Username / Password cannot consist only of whitespace characters")
 		return
 	}
 
+	dk, err := scrypt.Key([]byte(u.Password), []byte("all-your-hash-belong-to-dr-seuss"), 16384, 8, 1, 32)
+
+	if err != nil {
+		sendErrorResponse(w, "There was an unexpected error, try again.")
+		return
+	}
+	u.Password = ""
+	u.Hashed = dk
 	for i := range data.List {
 		if data.List[i].Name == u.Name {
-			if data.List[i].Password != u.Password {
+			if !bytes.Equal(data.List[i].Hashed, u.Hashed) {
 				if mode == "Debug" {
 					log.Println("Invalid submission attempt for account:", data.List[i].Name)
 				}

@@ -42,7 +42,7 @@ func main() {
 	go hub.Run()
 
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		login.API(&data, w, r, apiKey, conf.Mode)
+		login.API(&data, w, r, apiKey, conf.Mode, db)
 	})
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
