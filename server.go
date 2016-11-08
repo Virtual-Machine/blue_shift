@@ -1,26 +1,37 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
 	"./config"
 	"./login"
 	"./socket"
+
+	"github.com/boltdb/bolt"
 )
 
 var data login.UserList
 
-func init() {
-	var u login.User
-	u.Name = "ADMIN"
-	u.Password = "aa"
-	u.Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IkFETUlOIn0.vYW2lGzXBJzsDp6hmTI3sqUbRFT98-q4rSj1V4fSfLo"
-	u.Admin = true
-	data.List = append(data.List, u)
-}
-
 func main() {
+	db, err := bolt.Open("users.db", 0600, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+	db.View(func(tx *bolt.Tx) error {
+		var user login.User
+		b := tx.Bucket([]byte("users"))
+		v := b.Get([]byte("ADMIN"))
+		err := json.Unmarshal(v, &user)
+		if err != nil {
+			return err
+		}
+		data.List = append(data.List, user)
+		return nil
+	})
+
 	log.SetFlags(log.Lshortfile)
 
 	conf := config.DecodeConfiguration()
