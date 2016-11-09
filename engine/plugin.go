@@ -2,7 +2,7 @@ package engine
 
 type plugin interface {
 	ProcessClick(user string, x int, y int) (bool, error)
-	GetData(user string, request string) []byte
+	GetData() []byte
 	StartGame(players []string)
 }
 

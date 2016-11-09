@@ -133,8 +133,8 @@ func (h *Hub) processRequest(packet *packet, req request) {
 		h.processStart(packet, req)
 		return
 	}
-	if req.Type == "MapData" {
-		packet.Data = string(engine.GameInstance.GetData(packet.ID, "MapData"))
+	if req.Type == "GameData" {
+		packet.Data = string(engine.GameInstance.GetData())
 		h.sendBroadcast(packet)
 		return
 	}
@@ -195,7 +195,7 @@ func (h *Hub) processClick(p *packet, r request) {
 	}
 	validMove, err := engine.GameInstance.ProcessClick(p.ID, r.X, r.Y)
 	if validMove {
-		p.Data = string(engine.GameInstance.GetData(p.ID, "MapData"))
+		p.Data = string(engine.GameInstance.GetData())
 		h.sendBroadcast(p)
 		return
 	}

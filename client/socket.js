@@ -18,13 +18,7 @@ function establishSocketConnection(token) {
 	conn.onmessage = function (evt) {
 		// MARKER Client -> Client is receiving data from socket hub
 		var parsedPacket = JSON.parse(evt.data)
-		if (parsedPacket instanceof Array){
-			console.log("Got map data: ", parsedPacket)
-			// TODO Process map data
-		} else {
-			console.log("Got data packet: ", parsedPacket)
-			processPacket(parsedPacket)
-		}
+		processPacket(parsedPacket)
 	}
 	conn.onerror = function (evt) {
 	    console.log("Error:", evt)
@@ -34,6 +28,10 @@ function establishSocketConnection(token) {
 }
 
 function processPacket(parsedPacket){
+	if(parsedPacket.MapData){
+		window.canvas.state.setActive(parsedPacket.Active)
+		// TODO process mapdata
+	}
 	if(parsedPacket.display_admin_panel){
 		$adminPanel.style.display = "block"
 		updateUserList(parsedPacket.user_list)

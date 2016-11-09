@@ -47,13 +47,10 @@ func (g *mockGameEngine) ProcessClick(user string, x int, y int) (bool, error) {
 	return false, errors.New("Cell is not clickable")
 }
 
-func (g *mockGameEngine) GetData(user string, request string) []byte {
-	if request == "MapData" {
-		blob, err := json.Marshal(g.MapData)
-		if err != nil {
-			log.Fatal(err)
-		}
-		return blob
+func (g *mockGameEngine) GetData() []byte {
+	blob, err := json.Marshal(g)
+	if err != nil {
+		log.Fatal(err)
 	}
-	return []byte("Unknown request string")
+	return blob
 }
